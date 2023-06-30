@@ -1,2 +1,2 @@
 # Tracks
-A side project
+A side project: possibly an app to track multiple people on map

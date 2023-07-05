@@ -6,4 +6,5 @@ A side project: possibly an app to track multiple people on map
 3. Had to point the local npm to local .npmrc, with default registry, not the company's artifactory
 4. npm install expo-cli
 5. npx create-expo-app tracks
+To be updated further
 

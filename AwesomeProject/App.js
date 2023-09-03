@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import MapView,{Marker} from 'react-native-maps';
 import { StyleSheet, View } from 'react-native';
 import * as Location from 'expo-location';
+import './config/firebaseConfig';
 
 export default function App() {
   const [location, setLocation] = useState({latitude:10, longitude:10});

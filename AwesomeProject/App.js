@@ -18,15 +18,11 @@ export default function App() {
     })();
   }, []);
 
-  let text = 'Waiting..';
-  if (errorMsg) {
-    text = errorMsg;
-  } else if (location) {
-    text = JSON.stringify(location);
-  }
-
   return (
     <View style={styles.container}>
+      {
+      errorMsg ? 
+      <Text>errorMsg</Text> : 
       <MapView style={styles.map}>
         <Marker
         coordinate={location}
@@ -34,6 +30,7 @@ export default function App() {
         description="Current location"
         />
       </MapView>
+      }
     </View>
   );
 }

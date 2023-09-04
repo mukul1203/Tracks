@@ -4,11 +4,14 @@ import { StyleSheet, View } from 'react-native';
 import * as Location from 'expo-location';
 import './config/firebaseConfig';
 import RootNavigation from './navigation';
+import { ThemeProvider } from 'react-native-elements';
 
 
 export default function App() {
   return (
-    <RootNavigation />
+    <ThemeProvider>
+      <RootNavigation/>
+    </ThemeProvider>
   );
 }
 

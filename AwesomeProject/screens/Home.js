@@ -2,7 +2,9 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useAuthentication } from '../utils/hooks/useAuthentication';
 import { Button } from 'react-native-elements';
-import { signOut } from 'firebase/auth';
+import { getAuth, signOut } from 'firebase/auth';
+
+const auth = getAuth();
 
 export default function HomeScreen() {
   const { user } = useAuthentication();

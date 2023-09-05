@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import HomeScreen from '../screens/Home';
+import CreateGroupScreen from '../screens/CreateGroup';
 
 const Stack = createStackNavigator();
 
@@ -11,6 +12,7 @@ export default function UserStack() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Create Group" component={CreateGroupScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

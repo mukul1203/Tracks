@@ -18,7 +18,7 @@ export function useUsers(init) {
             setAllUsers({...allUsers, [data.key]:data.exportVal()});
         });
         const unsubscribeChange = onChildChanged(usersRef, (data)=>{
-            setAllUsers({...allUsers, [data.key]:data.value()});
+            setAllUsers({...allUsers, [data.key]:data.exportVal()});
         });
         const unsubscribeRemove = onChildRemoved(usersRef, (data)=>{
             setAllUsers((current)=>{

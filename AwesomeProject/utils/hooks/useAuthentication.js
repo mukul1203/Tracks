@@ -16,7 +16,7 @@ export function useAuthentication() {
         // User is signed out
         setUser(undefined);
       }
-    });
+    },[]);
 
     return unsubscribeFromAuthStateChanged;
   }, []);

@@ -15,14 +15,14 @@ export function useUsers(init) {
         
         const usersRef = ref(database, 'users/');
         const unsubscribeAdd = onChildAdded(usersRef, (data)=>{
-            setAllUsers({...allUsers, [data.key]:data.exportVal()});
+            setAllUsers((currentUsers)=>({...currentUsers, [data.key]:data.exportVal()}));
         });
         const unsubscribeChange = onChildChanged(usersRef, (data)=>{
-            setAllUsers({...allUsers, [data.key]:data.exportVal()});
+            setAllUsers((currentUsers)=>({...currentUsers, [data.key]:data.exportVal()}));
         });
         const unsubscribeRemove = onChildRemoved(usersRef, (data)=>{
-            setAllUsers((current)=>{
-                const {[data.key]:excluded, ...rest} = current;
+            setAllUsers((currentUsers)=>{
+                const {[data.key]:excluded, ...rest} = currentUsers;
                 return rest;
             });
         });

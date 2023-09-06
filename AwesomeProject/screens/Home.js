@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { useAuthentication } from '../utils/hooks/useAuthentication';
 import { Button } from 'react-native-elements';
 import { getAuth, signOut } from 'firebase/auth';
 import { useUsers } from '../utils/hooks/useUsers';
@@ -55,10 +54,10 @@ const auth = getAuth();
 //   }
 // });
 
-
 export default function HomeScreen() {
+  
   const [allUsers, updateCurrentUser] = useUsers({});
-  const { user } = useAuthentication();
+  const user = auth.currentUser;
   const [errorMsg, setErrorMsg] = useState(null);
   const [region, setRegion] = useState(
                                       {
@@ -80,7 +79,7 @@ export default function HomeScreen() {
       await updateCurrentUser(user.uid, {latitude, longitude, email:user.email});
       }
       catch(error) {
-        setErrorMsg(error);
+        setErrorMsg("Update to db failed!");
         return;
       }
       setRegion({...region, latitude, longitude});
@@ -113,11 +112,11 @@ export default function HomeScreen() {
     <View style={styles.container}>
       {
       errorMsg ? 
-      <Text>errorMsg</Text> :  
+      <Text>{errorMsg}</Text> :  
       [
-      <Button title="Sign Out" style={styles.button} onPress={() => signOut(auth)} />,
-      // <Text>{Object.keys(allUsers).length}</Text>,
-      <MapView style={styles.map} region={region}
+      <Button key="Sign Out" title="Sign Out" style={styles.button} onPress={() => signOut(auth)} />,
+      <Text>{Object.keys(allUsers).length}</Text>,
+      <MapView key= "Map" style={styles.map} region={region}
       onRegionChange={onRegionChange}>
       { getMarkers() }
       </MapView>

@@ -15,7 +15,7 @@ export function useUsers(init) {
         
         const usersRef = ref(database, 'users/');
         const unsubscribeAdd = onChildAdded(usersRef, (data)=>{
-            setAllUsers({...allUsers, [data.key]:data.value()});
+            setAllUsers({...allUsers, [data.key]:data.exportVal()});
         });
         const unsubscribeChange = onChildChanged(usersRef, (data)=>{
             setAllUsers({...allUsers, [data.key]:data.value()});
@@ -26,11 +26,6 @@ export function useUsers(init) {
                 return rest;
             });
         });
-        // const unsubscribe = onValue(usersRef, (snapshot) => {
-        //     const users = snapshot.val();
-        //     setAllUsers(users);
-        //   });
-        // return unsubscribe;
         return ()=>{ unsubscribeAdd(); unsubscribeChange(); unsubscribeRemove(); }
     },[]);
 

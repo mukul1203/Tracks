@@ -4,7 +4,7 @@ import { Button } from 'react-native-elements';
 import { getAuth, signOut } from 'firebase/auth';
 import { useUsers } from '../utils/hooks/useUsers';
 import MapView,{Marker} from 'react-native-maps';
-import * as Location from 'expo-location';
+import { useLocation } from '../utils/hooks/useLocation';
 
 const auth = getAuth();
 
@@ -54,37 +54,33 @@ const auth = getAuth();
 //   }
 // });
 
-export default function HomeScreen() {
-  
-  const [allUsers, updateCurrentUser] = useUsers({});
-  const user = auth.currentUser;
+export default function HomeScreen({groupId}) {//homescreen is for an existing group
+  const initLocation = {latitude: 10, longitude: 10};
+  const [allUsers, updateUser] = useUsers({});
   const [errorMsg, setErrorMsg] = useState(null);
   const [region, setRegion] = useState(
                                       {
-                                        latitude: 10,
-                                        longitude: 10,
+                                        ...initLocation,
                                         latitudeDelta: 0.0922,
                                         longitudeDelta: 0.0421
                                       }
                                       );
+  const [location, locationErrorMsg] = useLocation(initLocation);
+  if(locationErrorMsg.length) //FIXME
+    setErrorMsg(locationErrorMsg);
+
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
-      let {coords:{latitude, longitude}} = await Location.getCurrentPositionAsync({});
-      try{
-      await updateCurrentUser(user.uid, {latitude, longitude, email:user.email});
+      try {
+        await updateUser(location);
       }
       catch(error) {
-        setErrorMsg("Update to db failed!");
+        setErrorMsg("Update to db failed! " + error.message);
         return;
       }
       setRegion({...region, latitude, longitude});
     })();
-  }, []);
+  }, [location]);
 
   const onRegionChange = useCallback((inRegion, gesture)=>{
     if(!gesture.isGesture) //FIXME: this won't work for apple maps.

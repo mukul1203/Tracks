@@ -5,7 +5,7 @@ export function useLocation(initLocation) {
     const [location, setLocation] = useState(initLocation);
     const [errorMsg, setErrorMsg] = useState("");
     useEffect(() => {
-        (async () => {
+        const updateCurrentLocation = async () => {
           let { status } = await Location.requestForegroundPermissionsAsync();
           if (status !== 'granted') {
             setErrorMsg('Permission to access location was denied');
@@ -13,7 +13,9 @@ export function useLocation(initLocation) {
           }
           let {coords:{latitude, longitude}} = await Location.getCurrentPositionAsync({});
           setLocation({latitude, longitude});
-        })();
+        };
+
+        updateCurrentLocation();
       }, []);
 
       return [location, errorMsg];

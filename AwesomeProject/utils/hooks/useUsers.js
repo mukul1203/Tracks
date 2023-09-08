@@ -4,9 +4,9 @@ import { getAuth } from "firebase/auth";
 
 const database = getDatabase();
 const auth = getAuth();
-export function useUsers(init) {
+export function useUsers(initUsers) {
     
-    const [allUsers, setAllUsers] = useState(init);
+    const [allUsers, setAllUsers] = useState(initUsers);
     const [groupId, setGroupId] = useState("hellow!");
 
     const updateUser = async ({latitude, longitude})=>{
@@ -22,7 +22,7 @@ export function useUsers(init) {
     };
 
     useEffect(() => {
-        const usersRef = ref(database, 'users/');//query(ref(database, 'users/'), [orderByChild('groupId'), equalTo(groupId)]);
+        const usersRef = query(ref(database, 'users/'), orderByChild('groupId'), equalTo(groupId));
         const unsubscribeAdd = onChildAdded(usersRef, (data)=>{
             setAllUsers((currentUsers)=>({...currentUsers, [data.key]:data.exportVal()}));
         });

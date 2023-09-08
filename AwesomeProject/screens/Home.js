@@ -55,8 +55,11 @@ const auth = getAuth();
 // });
 
 export default function HomeScreen({groupId}) {//homescreen is for an existing group
+  //TODO: even updateUser need not be here.
+  //Just get allUsers data somehow. Responsibility of updation should be hidden inside the useUsers,
+  //by using the useLocation internally.
   const initLocation = {latitude: 10, longitude: 10};
-  const [allUsers, updateUser] = useUsers({});
+  const [allUsers, updateUser] = useUsers({}, groupId);
   const [errorMsg, setErrorMsg] = useState(null);
   const [region, setRegion] = useState(
                                       {

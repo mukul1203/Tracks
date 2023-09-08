@@ -30,7 +30,7 @@ const auth = getAuth();
 //For now, on sign up, just show the map with current loc, and locations of ALL the other users who
 //have signed up. BRUTE FORCE!
 //Provide a sign out button too on top right of map
-// export default function HomeScreen({ navigation }) {
+// export default function MapScreen({ navigation }) {
 //   const { user } = useAuthentication();
   
 //   return (
@@ -54,7 +54,7 @@ const auth = getAuth();
 //   }
 // });
 
-export default function HomeScreen({route:{params:{groupId}}, navigation}) {//homescreen is for an existing group
+export default function MapScreen({route:{params:{groupId}}, navigation}) {//MapScreen is for an existing group
   //TODO: even updateUser need not be here.
   //Just get allUsers data somehow. Responsibility of updation should be hidden inside the useUsers,
   //by using the useLocation internally.

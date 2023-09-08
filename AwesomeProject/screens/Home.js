@@ -54,7 +54,7 @@ const auth = getAuth();
 //   }
 // });
 
-export default function HomeScreen({groupId}) {//homescreen is for an existing group
+export default function HomeScreen({route:{params:{groupId}}, navigation}) {//homescreen is for an existing group
   //TODO: even updateUser need not be here.
   //Just get allUsers data somehow. Responsibility of updation should be hidden inside the useUsers,
   //by using the useLocation internally.

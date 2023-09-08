@@ -4,19 +4,11 @@ import { getAuth } from "firebase/auth";
 
 const database = getDatabase();
 const auth = getAuth();
-export function useUsers(initUsers) {
+export function useUsers(initUsers, groupId) {
     
     const [allUsers, setAllUsers] = useState(initUsers);
-    const [groupId, setGroupId] = useState("hellow!");
 
     const updateUser = async ({latitude, longitude})=>{
-        if(false)//if this is a new entry
-        {   
-            const groupRef = push(ref(database, 'groups/'));
-            const groupId = groupRef.key;
-            setGroupId(groupId);
-            await set(groupRef, true);
-        }
         //send the data to DB
         await set(ref(database, 'users/' + auth.currentUser.uid), {latitude, longitude, email:auth.currentUser.email, groupId});
     };

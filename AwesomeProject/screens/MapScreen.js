@@ -5,6 +5,7 @@ import { getAuth, signOut } from 'firebase/auth';
 import { useUsers } from '../utils/hooks/useUsers';
 import MapView,{Marker} from 'react-native-maps';
 import { useLocation } from '../utils/hooks/useLocation';
+import { exitGroup } from '../utils/hooks/useGroup';
 
 const auth = getAuth();
 
@@ -68,7 +69,7 @@ export default function MapScreen({route:{params:{groupId}}, navigation}) {//Map
       errorMsg ? 
       <Text>{errorMsg}</Text> :  
       [
-      <Button key="Sign Out" title="Sign Out" style={styles.button} onPress={() => signOut(auth)} />,
+      <Button key="Exit Group" title="Exit Group" style={styles.button} onPress={() => exitGroup(groupId)} />,
       <Text>{Object.keys(allUsers).length}</Text>,
       <MapView key= "Map" style={styles.map} region={region}
       onRegionChange={onRegionChange}>

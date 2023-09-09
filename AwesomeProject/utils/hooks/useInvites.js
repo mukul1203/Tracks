@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 
 const auth = getAuth();
 const database = getDatabase();
+export function invite(email) {
+    
+}
 
 export function useInvites(init) {
     const [invites, setInvites] = useState(init);

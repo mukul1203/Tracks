@@ -5,16 +5,21 @@ import { createStackNavigator } from '@react-navigation/stack';
 import MapScreen from '../screens/MapScreen';
 import CreateGroupScreen from '../screens/CreateGroupScreen';
 import SignedInScreen from '../screens/SignedInScreen';
+import { useGroup } from '../utils/hooks/useGroup';
 
 const Stack = createStackNavigator();
 
 export default function UserStack() {
+  const [groupId] = useGroup(null);
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Signed In" component={SignedInScreen} />
+        {groupId ? 
+        <Stack.Screen name="Map" component={MapScreen} initialParams={{groupId}}/> :
+        (
+        <Stack.Screen name="Signed In" component={SignedInScreen} />,
         <Stack.Screen name="Create Group" component={CreateGroupScreen} />
-        <Stack.Screen name="Map" component={MapScreen} />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,18 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { Button, Input } from 'react-native-elements';
-import { useGroup } from '../utils/hooks/useGroup';
+import { createGroup } from '../utils/hooks/useGroup';
 
 const CreateGroupScreen = function({ navigation }) {
-  const [{groupId, members}, setGroup] = useGroup({groupId:null, members:[]});
   const [list, setList] = useState([]);//list of emails state
   const [entry, setEntry] = useState(null);//input box state
   const keyExtractor = (item, index) => index.toString();
-
-  useEffect(()=>{
-    if(groupId != null)
-      navigation.navigate('Map', {groupId});
-  },[groupId]);
 
   return (
       <View style={styles.container}>
@@ -33,7 +27,7 @@ const CreateGroupScreen = function({ navigation }) {
           </FlatList>
           <Button title="Done" buttonStyle={styles.button} 
           onPress={() => { 
-            setGroup(list);
+            createGroup(list);
           }}>
           </Button>
       </View>

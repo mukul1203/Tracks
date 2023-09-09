@@ -11,7 +11,7 @@ const CreateGroupScreen = function({ navigation }) {
 
   useEffect(()=>{
     if(groupId != null)
-      navigation.navigate('Home', {groupId});
+      navigation.navigate('Map', {groupId});
   },[groupId]);
 
   return (

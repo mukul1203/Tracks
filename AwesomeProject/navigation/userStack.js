@@ -17,8 +17,10 @@ export default function UserStack() {
         {groupId ? 
         <Stack.Screen name="Map" component={MapScreen} initialParams={{groupId}}/> :
         (
-        <Stack.Screen name="Signed In" component={SignedInScreen} />,
-        <Stack.Screen name="Create Group" component={CreateGroupScreen} />
+        <Stack.Group>
+          <Stack.Screen name="Signed In" component={SignedInScreen} />
+          <Stack.Screen name="Create Group" component={CreateGroupScreen} />
+        </Stack.Group>
         )}
       </Stack.Navigator>
     </NavigationContainer>

@@ -8,7 +8,8 @@ const auth = getAuth();
 export const createGroup = async (emails) => {
     const groupRef = push(ref(database, 'groups/'));
     await set(groupRef, JSON.stringify(emails));//for now just push the emails as stringified list
-    setGroupInfo({groupId: groupRef.key, emails:emails});
+    //set the group Id for current user
+    await set(ref(database, 'users/'+auth.currentUser.uid+'/groupId'), groupRef.key);
     //Also update invitees' invites list with this group id
     //TODO: optimize. First fetch all users, then batch the updates using update()
     for(let i = 0; i < emails.length; i++) {

@@ -1,46 +1,15 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
-import { getAuth, signOut } from 'firebase/auth';
 import { useUsers } from '../utils/hooks/useUsers';
 import MapView,{Marker} from 'react-native-maps';
-import { useLocation } from '../utils/hooks/useLocation';
 import { exitGroup } from '../utils/hooks/useGroup';
-
-const auth = getAuth();
-
+import { useMapRegion } from '../utils/hooks/useMapRegion';
 
 export default function MapScreen({route:{params:{groupId}}, navigation}) {//MapScreen is for an existing group
-  //TODO: even updateUser need not be here.
-  //Just get allUsers data somehow. Responsibility of updation should be hidden inside the useUsers,
-  //by using the useLocation internally.
-  const initLocation = {latitude: 10, longitude: 10};
-  const [allUsers, updateUser] = useUsers({}, groupId);
-  const [errorMsg, setErrorMsg] = useState(null);
-  const [region, setRegion] = useState(
-                                      {
-                                        ...initLocation,
-                                        latitudeDelta: 0.0922,
-                                        longitudeDelta: 0.0421
-                                      }
-                                      );
-  const [location, locationErrorMsg] = useLocation(initLocation);
-  if(locationErrorMsg.length) //FIXME
-    setErrorMsg(locationErrorMsg);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        await updateUser(location);
-      }
-      catch(error) {
-        setErrorMsg("Update to db failed! " + error.message);
-        return;
-      }
-      setRegion({...region, latitude, longitude});
-    })();
-  }, [location]);
-
+  const [allUsers] = useUsers(groupId);
+  const [errorMsg] = useState(null);
+  const [region, setRegion] = useMapRegion(allUsers);
   const onRegionChange = useCallback((inRegion, gesture)=>{
     if(!gesture.isGesture) //FIXME: this won't work for apple maps.
       setRegion(inRegion);
@@ -50,7 +19,7 @@ export default function MapScreen({route:{params:{groupId}}, navigation}) {//Map
     let markers = [];
     for (let userId in allUsers) {
       if (allUsers.hasOwnProperty(userId)) {
-        let {latitude, longitude, email} = allUsers[userId];
+        let {latitude=0, longitude=0, email} = allUsers[userId];
         markers.push(
         <Marker
           coordinate={{latitude, longitude}}
@@ -67,7 +36,7 @@ export default function MapScreen({route:{params:{groupId}}, navigation}) {//Map
     <View style={styles.container}>
       {
       errorMsg ? 
-      <Text>{errorMsg}</Text> :  
+      <Text>{errorMsg}</Text>:
       [
       <Button key="Exit Group" title="Exit Group" style={styles.button} onPress={() => exitGroup(groupId)} />,
       <Text>{Object.keys(allUsers).length}</Text>,

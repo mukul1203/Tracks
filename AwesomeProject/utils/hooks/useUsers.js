@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
-import { getDatabase, ref, set, onChildAdded, onChildChanged, onChildRemoved, query, orderByChild, equalTo, push } from "firebase/database";
+import { getDatabase, ref, update, onChildAdded, onChildChanged, onChildRemoved, query, orderByChild, equalTo, set } from "firebase/database";
 import { getAuth } from "firebase/auth";
 
 const database = getDatabase();
 const auth = getAuth();
-export function useUsers(initUsers, groupId) {
-    
-    const [allUsers, setAllUsers] = useState(initUsers);
 
-    const updateUser = async ({latitude, longitude})=>{
-        //send the data to DB
-        await set(ref(database, 'users/' + auth.currentUser.uid), {latitude, longitude, email:auth.currentUser.email, groupId});
-    };
+export const updateUser = async ({latitude, longitude})=>{
+    //send the data to DB
+    const updates = {latitude, longitude};
+    await update(ref(database, '/users/'+auth.currentUser.uid+'/'), updates);
+};
+
+export function useUsers(groupId) {
+    
+    const [allUsers, setAllUsers] = useState({});
 
     useEffect(() => {
         const usersRef = query(ref(database, 'users/'), orderByChild('groupId'), equalTo(groupId));
@@ -30,5 +32,5 @@ export function useUsers(initUsers, groupId) {
         return ()=>{ unsubscribeAdd(); unsubscribeChange(); unsubscribeRemove(); }
     },[groupId]);
 
-    return [ allUsers, updateUser];
+    return [ allUsers ];
 }

@@ -8,8 +8,8 @@ import { useMapRegion } from '../utils/hooks/useMapRegion';
 
 export default function MapScreen({route:{params:{groupId}}, navigation}) {//MapScreen is for an existing group
   const [allUsers] = useUsers(groupId);
-  const [errorMsg] = useState(null);
-  const [region, setRegion] = useMapRegion(allUsers);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [region, setRegion, locationErrorMsg] = useMapRegion(allUsers);
   const onRegionChange = useCallback((inRegion, gesture)=>{
     if(!gesture.isGesture) //FIXME: this won't work for apple maps.
       setRegion(inRegion);

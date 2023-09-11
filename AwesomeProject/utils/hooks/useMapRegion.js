@@ -1,8 +1,7 @@
 import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 import { useEffect, useState } from "react";
-import { useLocation } from "./useLocation";
-import { updateUser } from "./useUsers";
+import { useLocationEffect } from "./useLocationEffect";
 
 
 const auth = getAuth();
@@ -17,7 +16,7 @@ export function useMapRegion(users) {
         latitudeDelta: 10.0922,
         longitudeDelta: 10.0421
       });
-    const [location, errorMsg] = useLocation({latitude:0, longitude:0});//TODO: remove this
+    const [errorMsg] = useLocationEffect({latitude:0, longitude:0});//TODO: remove this
     //TODO: calculate region to be a bounding box of users' positions
     //For now, just focus the region on position of the active user
     const {latitude=0, longitude=0} = users[auth.currentUser.uid] ? users[auth.currentUser.uid] : {latitude:0, longitude:0};
@@ -28,5 +27,5 @@ export function useMapRegion(users) {
     //TODO: there is a conflict here.
     //User may setRegion forcibly by scrolling. We should maintain that region
     //but currently, it will automatically refocus on the user position due to above useEffect call.
-    return [region, setRegion];
+    return [region, setRegion, errorMsg];
  };

@@ -23,7 +23,7 @@ export function useLocationEffect() {
           setErrorMsg(errorMsg);
           return;
         }
-        await Location.watchPositionAsync({
+        return await Location.watchPositionAsync({
             accuracy:Location.Accuracy.Highest, 
             distanceInterval:10, 
             timeInterval:1000

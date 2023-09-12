@@ -1,11 +1,19 @@
 import { getAuth } from "firebase/auth";
-import { getDatabase, onChildAdded, onChildChanged, onChildRemoved, ref } from "firebase/database";
+import { equalTo, get, getDatabase, onChildAdded, onChildRemoved, orderByChild, query, ref, set } from "firebase/database";
 import { useEffect, useState } from "react";
 
 const auth = getAuth();
 const database = getDatabase();
-export function invite(email) {
-    
+export async function invite(emails, groupId) {
+  //TODO: optimize. First fetch all users, then batch the updates using update()
+  for(let i = 0; i < emails.length; i++) {
+    const usersRef = query(ref(database, 'users/'),orderByChild('email'),equalTo(emails[i]));
+    await get(usersRef).then((users)=>{
+        const userIds = Object.keys(users.exportVal()); //There should be only one userId with given email
+        if(userIds.length == 1)
+            return set(ref(database, 'users/'+userIds[0]+'/invites/'+groupId), true);
+    });
+}  
 }
 
 export function useInvites(init) {
@@ -15,13 +23,10 @@ export function useInvites(init) {
         const unsubscribeAdd = onChildAdded(invitesRef, (data)=>{
             setInvites((invites)=>([...invites, data.key]));
         });
-        // const unsubscribeChange = onChildChanged(invitesRef, (data)=>{
-        //     setInvites((invites)=>([...invites, data.key]));
-        // });
         const unsubscribeRemove = onChildRemoved(invitesRef, (data)=>{
             setInvites((invites)=>invites.filter((elem)=>(elem!=data.key)));
         });
-        return ()=>{ unsubscribeAdd(); unsubscribeRemove(); }//unsubscribeChange();
+        return ()=>{ unsubscribeAdd(); unsubscribeRemove(); }
     },[])
     return [invites]
 }

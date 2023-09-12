@@ -1,6 +1,7 @@
 import { equalTo, get, getDatabase, onValue, orderByChild, push, query, ref, set } from "firebase/database";
 import { getAuth } from "firebase/auth";
 import { useEffect, useState } from "react";
+import { invite } from "./useInvites";
 
 const database = getDatabase();
 const auth = getAuth();
@@ -11,15 +12,7 @@ export const createGroup = async (emails) => {
     //set the group Id for current user
     await set(ref(database, 'users/'+auth.currentUser.uid+'/groupId'), groupRef.key);
     //Also update invitees' invites list with this group id
-    //TODO: optimize. First fetch all users, then batch the updates using update()
-    for(let i = 0; i < emails.length; i++) {
-        const usersRef = query(ref(database, 'users/'),orderByChild('email'),equalTo(emails[i]));
-        await get(usersRef).then((users)=>{
-            const userIds = Object.keys(users.exportVal()); //There should be only one userId with given email
-            if(userIds.length == 1)
-                return set(ref(database, 'users/'+userIds[0]+'/invites/'+groupRef.key), true);
-        });
-    }
+    await invite(emails, groupRef.key);
 };
 
 export const exitGroup = (groupId) => {

@@ -1,7 +1,8 @@
-import { getAuth, signOut } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { Button, FlatList, StyleSheet, View, Text } from "react-native";
 import { useInvites } from "../utils/hooks/useInvites";
 import { joinGroup } from "../utils/hooks/useGroup";
+import { userSignOut } from "../utils/hooks/useAuthentication";
 
 const auth = getAuth();
 export default function SignedInScreen({ navigation }) {
@@ -22,7 +23,7 @@ export default function SignedInScreen({ navigation }) {
         renderItem={({item}) => JoinGroupListItem(item)}
       >
       </FlatList>
-      <Button title="Sign Out" style={styles.button} onPress={() => signOut(auth)} />
+      <Button title="Sign Out" style={styles.button} onPress={userSignOut} />
       <Button title="Create Group" style={styles.button} onPress={() => navigation.navigate('Create Group')} />
     </View>
   );

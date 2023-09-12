@@ -1,7 +1,33 @@
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 
 const auth = getAuth();
+
+export async function userSignIn(email, password) {
+  if (email === '' || password === '') {
+    throw new Error('Email and password are mandatory.');
+  }
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function userSignOut() {
+  return signOut(auth);
+}
+
+export async function userSignUp(email, password) {
+  if (email === '' || password === '') {
+    throw new Error('Email and password are mandatory.');
+  }
+  try {
+    await createUserWithEmailAndPassword(auth, email, password);
+  } catch (error) {
+    throw error;
+  }
+}
 
 export function useAuthentication() {
   const [user, setUser] = useState();

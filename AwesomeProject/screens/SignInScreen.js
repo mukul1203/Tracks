@@ -2,9 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button } from 'react-native-elements';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-
-const auth = getAuth();
+import { userSignIn } from '../utils/hooks/useAuthentication';
 
 const SignInScreen = () => {
   const [value, setValue] = React.useState({
@@ -14,16 +12,8 @@ const SignInScreen = () => {
   })
 
   async function signIn() {
-    if (value.email === '' || value.password === '') {
-      setValue({
-        ...value,
-        error: 'Email and password are mandatory.'
-      })
-      return;
-    }
-
     try {
-      await signInWithEmailAndPassword(auth, value.email, value.password);
+      await userSignIn(value.email, value.password);
     } catch (error) {
       setValue({
         ...value,

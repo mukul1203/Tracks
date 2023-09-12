@@ -1,14 +1,17 @@
 import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { getDatabase, ref, set } from 'firebase/database';
 import { useEffect, useState } from 'react';
 
 const auth = getAuth();
-
+const database = getDatabase();
 export async function userSignIn(email, password) {
   if (email === '' || password === '') {
     throw new Error('Email and password are mandatory.');
   }
   try {
     await signInWithEmailAndPassword(auth, email, password);
+    //Make the user entry in db here
+    set(ref(database, '/users/'+auth.currentUser.uid+'/email'), email);
   } catch (error) {
     throw error;
   }

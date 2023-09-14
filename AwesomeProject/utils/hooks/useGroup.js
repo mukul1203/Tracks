@@ -1,18 +1,24 @@
-import { equalTo, get, getDatabase, onValue, orderByChild, push, query, ref, set } from "firebase/database";
+import { getDatabase, onValue, push, ref, set } from "firebase/database";
 import { getAuth } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { invite } from "./useInvites";
+// import { firebaseKeyCodec } from "../firebaseKeyCodec";
 
 const database = getDatabase();
 const auth = getAuth();
 
 export const createGroup = async (emails) => {
     const groupRef = push(ref(database, 'groups/'));
+    // const emailsObj = emails.reduce((acc, cur)=>{
+    //     acc[firebaseKeyCodec.encodeFully(cur)] = true; //firebase doesn't allow ./$[] and some control chars in key
+    //     return acc;
+    // },{});
+    // await set(groupRef, emailsObj);
     await set(groupRef, JSON.stringify(emails));//for now just push the emails as stringified list
     //set the group Id for current user
     await set(ref(database, 'users/'+auth.currentUser.uid+'/groupId'), groupRef.key);
-    //Also update invitees' invites list with this group id
-    await invite(emails, groupRef.key);
+    //Also update invitees' invites list with this group id. Invite self also.
+    await invite([...emails, auth.currentUser.email], groupRef.key);
 };
 
 export const exitGroup = (groupId) => {

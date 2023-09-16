@@ -6,6 +6,25 @@ import MapView,{Marker} from 'react-native-maps';
 import { exitGroup } from '../utils/hooks/useGroup';
 import { useMapRegion } from '../utils/hooks/useMapRegion';
 
+function getBackgroundColor(latitude, longitude) {
+  //TODO: this should be fixed for a given user!
+  // Normalize latitude and longitude values to the range [0, 1]
+  const normalizedLatitude = (latitude + 90) / 180;
+  const normalizedLongitude = (longitude + 180) / 360;
+
+  // Map location to hue (0 to 360 degrees)
+  const hue = normalizedLatitude * normalizedLongitude * 360;
+
+  // Set saturation and lightness values to constants or adjust as needed
+  const saturation = 70; // You can adjust this value
+  const lightness = 50;  // You can adjust this value
+
+  // Convert HSL to RGB color
+  const hslColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+
+  return hslColor;
+}
+
 export default function MapScreen({route:{params:{groupId}}, navigation}) {//MapScreen is for an existing group
   const [allUsers] = useUsers(groupId);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -23,14 +42,26 @@ export default function MapScreen({route:{params:{groupId}}, navigation}) {//Map
     let markers = [];
     for (let userId in allUsers) {
       if (allUsers.hasOwnProperty(userId)) {
-        let {latitude=0, longitude=0, email} = allUsers[userId];
+        const {latitude=0, longitude=0, email} = allUsers[userId];
         markers.push(
         <Marker
           coordinate={{latitude, longitude}}
           title={email}
           description={JSON.stringify({latitude, longitude})}
           key={userId}
-        />
+        >
+          <View style={{
+            width: 16,
+            height: 16,
+            borderRadius: 8, // Half of the width and height to make it circular
+            backgroundColor: getBackgroundColor(latitude, longitude),
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 3, // Add a border
+            borderColor: 'black', // Border color
+          }}>
+          </View>
+        </Marker>
         );
       }
     }

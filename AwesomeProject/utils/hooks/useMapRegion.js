@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { useLocationEffect } from "./useLocationEffect";
 
 function getBoundingRegion(locations) {
-  const padding = 0.001;
+  const padding = 0.0001;
   const lats = locations.map((loc)=>loc.latitude);
   const longs = locations.map((loc)=>loc.longitude);
-  const minLat = Math.min(lats);
-  const maxLat = Math.max(lats);
-  const minLong = Math.min(longs);
-  const maxLong = Math.max(longs);
+  const minLat = Math.min(...lats);
+  const maxLat = Math.max(...lats);
+  const minLong = Math.min(...longs);
+  const maxLong = Math.max(...longs);
   const latitudeDelta = maxLat - minLat + 2*padding;
   const longitudeDelta = maxLong - minLong + 2*padding;
   const latitude = (maxLat+minLat)/2;

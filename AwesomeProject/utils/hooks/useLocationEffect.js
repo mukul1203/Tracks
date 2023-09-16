@@ -25,7 +25,7 @@ export function useLocationEffect() {
         }
         return await Location.watchPositionAsync({
             accuracy:Location.Accuracy.Highest, 
-            distanceInterval:10, 
+            distanceInterval:5, 
             timeInterval:1000
           }, async ({coords:{latitude, longitude}})=>{
           const {errorMsg} = await updateUserLocationInDB(latitude, longitude);

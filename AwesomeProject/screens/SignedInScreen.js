@@ -8,24 +8,35 @@ const auth = getAuth();
 export default function SignedInScreen({ navigation }) {
   const user = auth.currentUser;
   const [groupIds] = useInvites([]);
-  const JoinGroupListItem = (groupId)=>(
-    <View style={{...styles.container, flexDirection:"row"}}>
-    <Text>{groupId}</Text>
-    <Button title="Join" style={styles.button} onPress={()=>joinGroup(groupId)}/>
-    <Button title="Delete" style={styles.button} onPress={()=>deleteGroup(groupId)}/>
+  const JoinGroupListItem = (groupId) => (
+    <View style={{ ...styles.container, flexDirection: "row" }}>
+      <Text>{groupId}</Text>
+      <Button
+        title="Join"
+        style={styles.button}
+        onPress={() => joinGroup(groupId)}
+      />
+      <Button
+        title="Delete"
+        style={styles.button}
+        onPress={() => deleteGroup(groupId)}
+      />
     </View>
   );
   return (
     <View style={styles.container}>
       <Text>Welcome {user?.email}!</Text>
-      <FlatList 
-        keyExtractor={(groupId)=>groupId}
+      <FlatList
+        keyExtractor={(groupId) => groupId}
         data={groupIds}
-        renderItem={({item}) => JoinGroupListItem(item)}
-      >
-      </FlatList>
+        renderItem={({ item }) => JoinGroupListItem(item)}
+      ></FlatList>
       <Button title="Sign Out" style={styles.button} onPress={userSignOut} />
-      <Button title="Create Group" style={styles.button} onPress={() => navigation.navigate('Create Group')} />
+      <Button
+        title="Create Group"
+        style={styles.button}
+        onPress={() => navigation.navigate("Create Group")}
+      />
     </View>
   );
 }
@@ -33,11 +44,11 @@ export default function SignedInScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
   button: {
-    marginTop: 10
-  }
+    marginTop: 10,
+  },
 });

@@ -1,15 +1,15 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { Input, Button } from 'react-native-elements';
-import { userSignIn } from '../utils/hooks/useAuthentication';
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { Input, Button } from "react-native-elements";
+import { userSignIn } from "../utils/hooks/useAuthentication";
 
 const SignInScreen = () => {
   const [value, setValue] = React.useState({
-    email: '',
-    password: '',
-    error: ''
-  })
+    email: "",
+    password: "",
+    error: "",
+  });
 
   async function signIn() {
     try {
@@ -18,7 +18,7 @@ const SignInScreen = () => {
       setValue({
         ...value,
         error: error.message,
-      })
+      });
     }
   }
 
@@ -26,45 +26,43 @@ const SignInScreen = () => {
     <View style={styles.container}>
       <Text>Signin screen!</Text>
 
-      {!!value.error && <View style={styles.error}><Text>{value.error}</Text></View>}
+      {!!value.error && (
+        <View style={styles.error}>
+          <Text>{value.error}</Text>
+        </View>
+      )}
 
       <View style={styles.controls}>
         <Input
-          placeholder='Email'
+          placeholder="Email"
           containerStyle={styles.control}
           value={value.email}
           onChangeText={(text) => setValue({ ...value, email: text })}
-          leftIcon={<Icon
-            name='envelope'
-            size={16}
-          />}
+          leftIcon={<Icon name="envelope" size={16} />}
         />
 
         <Input
-          placeholder='Password'
+          placeholder="Password"
           containerStyle={styles.control}
           value={value.password}
           onChangeText={(text) => setValue({ ...value, password: text })}
           secureTextEntry={true}
-          leftIcon={<Icon
-            name='key'
-            size={16}
-          />}
+          leftIcon={<Icon name="key" size={16} />}
         />
 
         <Button title="Sign in" buttonStyle={styles.control} onPress={signIn} />
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 20,
-    backgroundColor: '#fff',
-    alignItems: 'stretch',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "stretch",
+    justifyContent: "center",
   },
 
   controls: {
@@ -72,15 +70,15 @@ const styles = StyleSheet.create({
   },
 
   control: {
-    marginTop: 10
+    marginTop: 10,
   },
 
   error: {
     marginTop: 10,
     padding: 10,
-    color: '#fff',
-    backgroundColor: '#D54826FF',
-  }
+    color: "#fff",
+    backgroundColor: "#D54826FF",
+  },
 });
 
 export default SignInScreen;

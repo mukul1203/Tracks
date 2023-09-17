@@ -1,71 +1,69 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { Input, Button } from 'react-native-elements';
-import { userSignUp } from '../utils/hooks/useAuthentication';
+import React, { useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { Input, Button } from "react-native-elements";
+import { userSignUp } from "../utils/hooks/useAuthentication";
 
 const SignUpScreen = ({ navigation }) => {
   const [value, setValue] = useState({
-    email: '',
-    password: '',
-    error: ''
+    email: "",
+    password: "",
+    error: "",
   });
 
   async function signUp() {
     try {
       await userSignUp(value.email, value.password);
-      navigation.navigate('Sign In');
+      navigation.navigate("Sign In");
     } catch (error) {
       setValue({
         ...value,
         error: error.message,
-      })
+      });
     }
   }
-  
+
   return (
     <View style={styles.container}>
       <Text>Signup screen!</Text>
 
-      {!!value.error && <View style={styles.error}><Text>{value.error}</Text></View>}
+      {!!value.error && (
+        <View style={styles.error}>
+          <Text>{value.error}</Text>
+        </View>
+      )}
 
       <View style={styles.controls}>
         <Input
-          placeholder='Email'
+          placeholder="Email"
           containerStyle={styles.control}
           value={value.email}
           onChangeText={(text) => setValue({ ...value, email: text })}
-          leftIcon={<Icon
-            name='envelope'
-            size={16}
-          />}
+          leftIcon={<Icon name="envelope" size={16} />}
         />
 
         <Input
-          placeholder='Password'
+          placeholder="Password"
           containerStyle={styles.control}
           value={value.password}
           onChangeText={(text) => setValue({ ...value, password: text })}
           secureTextEntry={true}
-          leftIcon={<Icon
-            name='key'
-            size={16}
-          />}
+          leftIcon={<Icon name="key" size={16} />}
         />
 
         <Button title="Sign up" buttonStyle={styles.control} onPress={signUp} />
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 20,
-    backgroundColor: '#fff',
-    alignItems: 'stretch',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "stretch",
+    justifyContent: "center",
   },
 
   controls: {
@@ -79,9 +77,9 @@ const styles = StyleSheet.create({
   error: {
     marginTop: 10,
     padding: 10,
-    color: '#fff',
-    backgroundColor: '#D54826FF',
-  }
+    color: "#fff",
+    backgroundColor: "#D54826FF",
+  },
 });
 
 export default SignUpScreen;

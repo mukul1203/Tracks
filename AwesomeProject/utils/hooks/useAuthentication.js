@@ -11,7 +11,7 @@ export async function userSignIn(email, password) {
   try {
     await signInWithEmailAndPassword(auth, email, password);
     //Make the user entry in db here
-    set(ref(database, '/users/'+auth.currentUser.uid+'/email'), email);
+    await set(ref(database, '/users/'+auth.currentUser.uid+'/email'), email);
   } catch (error) {
     throw error;
   }

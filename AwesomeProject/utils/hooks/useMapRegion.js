@@ -30,7 +30,8 @@ export function useMapRegion(users) {
       });
     const [errorMsg] = useLocationEffect({latitude:0, longitude:0});//TODO: remove this
     const locations = Object.keys(users).map((key)=>{
-      const {latitude, longitude} = users[key];
+      //user entry may not yet have lat long values, so default to 0
+      const {latitude=0, longitude=0} = users[key];
       return {latitude, longitude};
     });
     useEffect(()=>{

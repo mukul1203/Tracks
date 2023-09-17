@@ -15,7 +15,10 @@ export const auth = {
     try {
       await signInWithEmailAndPassword(firebaseAuth, email, password);
       //Make the user entry in db here
-      await database.set("/users/" + auth.currentUser.uid + "/email", email);
+      await database.set(
+        "/users/" + firebaseAuth.currentUser.uid + "/email",
+        email
+      );
     } catch (error) {
       throw error;
     }

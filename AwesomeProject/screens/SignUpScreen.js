@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Input, Button } from "react-native-elements";
-import { userSignUp } from "../utils/hooks/useAuthentication";
+import { auth } from "../services/auth";
 
 const SignUpScreen = ({ navigation }) => {
   const [value, setValue] = useState({
@@ -13,7 +13,7 @@ const SignUpScreen = ({ navigation }) => {
 
   async function signUp() {
     try {
-      await userSignUp(value.email, value.password);
+      await auth.userSignUp(value.email, value.password);
       navigation.navigate("Sign In");
     } catch (error) {
       setValue({

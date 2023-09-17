@@ -32,10 +32,9 @@ export default function MapScreen({
   navigation,
 }) {
   //MapScreen is for an existing group
-  const [allUsers] = useUsers(groupId);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [region, setRegion, locationErrorMsg, autoFocus] =
-    useMapRegion(allUsers);
+  const [allUsers] = useUsers(groupId, setErrorMsg);
+  const [region, setRegion, autoFocus] = useMapRegion(allUsers, setErrorMsg);
   //This is wierd, but works.
   //We need to use a ChangeComplete callback, not Change callback
   //and with the isGesture check. Will reason about it later,

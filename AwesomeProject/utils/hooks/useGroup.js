@@ -57,7 +57,7 @@ export const deleteGroup = (groupId) => {
   set(groupEntryRef, null);
 };
 
-export function useGroup(init) {
+export function useGroup(init, setErrorMsg) {
   const [groupId, setGroupId] = useState(init);
   //observe the groupId key of current user
   useEffect(() => {
@@ -65,9 +65,15 @@ export function useGroup(init) {
       database,
       "users/" + auth.currentUser.uid + "/groupId"
     );
-    const unsubscribe = onValue(groupIdRef, (snapshot) => {
-      setGroupId(snapshot.val()); //it will be null if the groupId is not present, which is fine
-    });
+    const unsubscribe = onValue(
+      groupIdRef,
+      (snapshot) => {
+        setGroupId(snapshot.val()); //it will be null if the groupId is not present, which is fine
+      },
+      (error) => {
+        setErrorMsg(error.message);
+      }
+    );
     return unsubscribe;
   }, []);
   return [groupId];

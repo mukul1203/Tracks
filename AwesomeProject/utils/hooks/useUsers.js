@@ -22,7 +22,7 @@ export const updateUser = async ({ latitude, longitude }) => {
   await update(ref(database, "/users/" + auth.currentUser.uid + "/"), updates);
 };
 
-export function useUsers(groupId) {
+export function useUsers(groupId, setErrorMsg) {
   const [allUsers, setAllUsers] = useState({});
 
   useEffect(() => {
@@ -31,24 +31,36 @@ export function useUsers(groupId) {
       orderByChild("groupId"),
       equalTo(groupId)
     );
-    const unsubscribeAdd = onChildAdded(usersRef, (data) => {
-      setAllUsers((currentUsers) => ({
-        ...currentUsers,
-        [data.key]: data.exportVal(),
-      }));
-    });
-    const unsubscribeChange = onChildChanged(usersRef, (data) => {
-      setAllUsers((currentUsers) => ({
-        ...currentUsers,
-        [data.key]: data.exportVal(),
-      }));
-    });
-    const unsubscribeRemove = onChildRemoved(usersRef, (data) => {
-      setAllUsers((currentUsers) => {
-        const { [data.key]: excluded, ...rest } = currentUsers;
-        return rest;
-      });
-    });
+    const unsubscribeAdd = onChildAdded(
+      usersRef,
+      (data) => {
+        setAllUsers((currentUsers) => ({
+          ...currentUsers,
+          [data.key]: data.exportVal(),
+        }));
+      },
+      (error) => setErrorMsg(error.message)
+    );
+    const unsubscribeChange = onChildChanged(
+      usersRef,
+      (data) => {
+        setAllUsers((currentUsers) => ({
+          ...currentUsers,
+          [data.key]: data.exportVal(),
+        }));
+      },
+      (error) => setErrorMsg(error.message)
+    );
+    const unsubscribeRemove = onChildRemoved(
+      usersRef,
+      (data) => {
+        setAllUsers((currentUsers) => {
+          const { [data.key]: excluded, ...rest } = currentUsers;
+          return rest;
+        });
+      },
+      (error) => setErrorMsg(error.message)
+    );
     return () => {
       unsubscribeAdd();
       unsubscribeChange();

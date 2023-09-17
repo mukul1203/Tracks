@@ -1,5 +1,5 @@
 import * as Location from "expo-location";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { updateUser } from "./useUsers";
 
 export async function updateUserLocationInDB(latitude, longitude) {
@@ -12,8 +12,7 @@ export async function updateUserLocationInDB(latitude, longitude) {
   return {};
 }
 
-export function useLocationEffect() {
-  const [errorMsg, setErrorMsg] = useState("");
+export function useLocationEffect(setErrorMsg) {
   useEffect(() => {
     const subscriptionPromise = (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync({});
@@ -41,5 +40,5 @@ export function useLocationEffect() {
       subscriptionPromise.then((subscription) => subscription.remove());
     };
   }, []);
-  return [errorMsg];
+  return [];
 }

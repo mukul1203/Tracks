@@ -20,7 +20,7 @@ function getBoundingRegion(locations) {
 //ReadWrite hook state
 //Maintains a state: region of map to be focussed
 //Depends on the various users being shown on map
-export function useMapRegion(users) {
+export function useMapRegion(users, setErrorMsg) {
   const [userOverridden, setUserOverridden] = useState(false);
   const [region, setRegion] = useState({
     latitude: 0,
@@ -28,7 +28,7 @@ export function useMapRegion(users) {
     latitudeDelta: 10.0922,
     longitudeDelta: 10.0421,
   });
-  const [errorMsg] = useLocationEffect({ latitude: 0, longitude: 0 }); //TODO: remove this
+  const [] = useLocationEffect({ latitude: 0, longitude: 0 }, setErrorMsg); //TODO: remove this
   const locations = Object.keys(users).map((key) => {
     //user entry may not yet have lat long values, so default to 0
     const { latitude = 0, longitude = 0 } = users[key];
@@ -47,5 +47,5 @@ export function useMapRegion(users) {
   const autoFocus = () => {
     setUserOverridden(false);
   };
-  return [region, customSetRegion, errorMsg, autoFocus];
+  return [region, customSetRegion, autoFocus];
 }

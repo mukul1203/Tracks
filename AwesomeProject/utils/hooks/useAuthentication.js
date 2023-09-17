@@ -41,7 +41,7 @@ export async function userSignUp(email, password) {
   }
 }
 
-export function useAuthentication() {
+export function useAuthentication(setErrorMsg) {
   const [user, setUser] = useState();
 
   useEffect(() => {

@@ -39,19 +39,27 @@ export async function invite(emails, groupId) {
   }
 }
 
-export function useInvites(init) {
+export function useInvites(init, setErrorMsg) {
   const [invites, setInvites] = useState(init);
   useEffect(() => {
     const invitesRef = ref(
       database,
       "users/" + auth.currentUser.uid + "/invites/"
     );
-    const unsubscribeAdd = onChildAdded(invitesRef, (data) => {
-      setInvites((invites) => [...invites, data.key]);
-    });
-    const unsubscribeRemove = onChildRemoved(invitesRef, (data) => {
-      setInvites((invites) => invites.filter((elem) => elem != data.key));
-    });
+    const unsubscribeAdd = onChildAdded(
+      invitesRef,
+      (data) => {
+        setInvites((invites) => [...invites, data.key]);
+      },
+      (error) => setErrorMsg(error.message)
+    );
+    const unsubscribeRemove = onChildRemoved(
+      invitesRef,
+      (data) => {
+        setInvites((invites) => invites.filter((elem) => elem != data.key));
+      },
+      (error) => setErrorMsg(error.message)
+    );
     return () => {
       unsubscribeAdd();
       unsubscribeRemove();

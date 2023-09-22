@@ -1,40 +1,27 @@
-import { getAuth } from "firebase/auth";
-import {
-  equalTo,
-  get,
-  getDatabase,
-  onChildAdded,
-  onChildRemoved,
-  orderByChild,
-  query,
-  ref,
-  set,
-} from "firebase/database";
 import { useEffect, useState } from "react";
+import { database } from "../../services/database";
+import { auth } from "../../services/auth";
+
 // import { firebaseKeyCodec } from "../firebaseKeyCodec";
 
-const auth = getAuth();
-const database = getDatabase();
+// Invite given emails to the given group
 export async function invite(emails, groupId) {
   //TODO: optimize. First fetch all users, then batch the updates using update()
   for (let i = 0; i < emails.length; i++) {
-    const usersRef = query(
-      ref(database, "users/"),
-      orderByChild("email"),
-      equalTo(emails[i])
-    );
-    await get(usersRef)
+    await database
+      .get("users/", ["email", "equals", emails[i]])
       .then((users) => {
-        const userIds = Object.keys(users.exportVal()); //There should be only one userId with given email
+        const userIds = Object.keys(users); //There should be only one userId with given email
         if (userIds.length == 1)
-          return set(
-            ref(database, "users/" + userIds[0] + "/invites/" + groupId),
+          return database.set(
+            "users/" + userIds[0] + "/invites/" + groupId,
             true
           );
       })
       .catch((error) => {
         //user with given email not found in users/
         //If we don't catch, none of the users get invites due to error thrown
+        console.log(error.message);
       });
   }
 }
@@ -42,21 +29,20 @@ export async function invite(emails, groupId) {
 export function useInvites(init, setErrorMsg) {
   const [invites, setInvites] = useState(init);
   useEffect(() => {
-    const invitesRef = ref(
-      database,
-      "users/" + auth.currentUser.uid + "/invites/"
-    );
-    const unsubscribeAdd = onChildAdded(
-      invitesRef,
-      (data) => {
-        setInvites((invites) => [...invites, data.key]);
+    const invitesPath = "users/" + auth.currentUser().uid + "/invites/";
+    const unsubscribeAdd = database.onChildAdded(
+      invitesPath,
+      [],
+      ({ key, val }) => {
+        setInvites((invites) => [...invites, key]);
       },
       (error) => setErrorMsg(error.message)
     );
-    const unsubscribeRemove = onChildRemoved(
-      invitesRef,
-      (data) => {
-        setInvites((invites) => invites.filter((elem) => elem != data.key));
+    const unsubscribeRemove = database.onChildRemoved(
+      invitesPath,
+      [],
+      ({ key, val }) => {
+        setInvites((invites) => invites.filter((elem) => elem != key));
       },
       (error) => setErrorMsg(error.message)
     );

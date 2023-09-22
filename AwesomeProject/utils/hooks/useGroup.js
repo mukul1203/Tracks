@@ -15,7 +15,7 @@ export const createGroup = async (emails) => {
   //set the group Id for current user
   await database.set("users/" + auth.currentUser().uid + "/groupId", key);
   //Also update invitees' invites list with this group id. Invite self also.
-  await invite([...emails, auth.currentUser.email], key);
+  await invite([...emails, auth.currentUser().email], key);
 };
 
 export const exitGroup = (groupId) => {

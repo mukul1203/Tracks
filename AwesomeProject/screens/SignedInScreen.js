@@ -1,56 +1,86 @@
-import { Button, FlatList, StyleSheet, View, Text } from "react-native";
+import { FlatList, StyleSheet, View, Text } from "react-native";
 import { useInvites } from "../utils/hooks/useInvites";
 import { deleteGroup, joinGroup } from "../utils/hooks/useGroup";
 import { auth } from "../services/auth";
+import { Background } from "./Background";
+import { Button } from "react-native-elements";
 
 export default function SignedInScreen({ navigation }) {
   const user = auth.currentUser();
   const [groupIds] = useInvites([]);
   const JoinGroupListItem = (groupId) => (
-    <View style={{ ...styles.container, flexDirection: "row" }}>
-      <Text>{groupId}</Text>
+    <View style={styles.listItem}>
+      <Text style={styles.text}>{groupId}</Text>
       <Button
         title="Join"
-        style={styles.button}
+        buttonStyle={styles.button}
         onPress={() => joinGroup(groupId)}
       />
       <Button
         title="Delete"
-        style={styles.button}
+        type="outline"
+        buttonStyle={styles.button}
         onPress={() => deleteGroup(groupId)}
       />
     </View>
   );
   return (
-    <View style={styles.container}>
-      <Text>Welcome {user?.email}!</Text>
-      <FlatList
-        keyExtractor={(groupId) => groupId}
-        data={groupIds}
-        renderItem={({ item }) => JoinGroupListItem(item)}
-      ></FlatList>
-      <Button
-        title="Sign Out"
-        style={styles.button}
-        onPress={auth.userSignOut}
-      />
-      <Button
-        title="Create Group"
-        style={styles.button}
-        onPress={() => navigation.navigate("Create Group")}
-      />
-    </View>
+    <Background>
+      <View style={styles.container}>
+        {/* <Text style={styles.text}>Welcome {user?.email}!</Text> */}
+        <Text style={{ ...styles.text, fontSize: 18 }}>Group Invites</Text>
+        <FlatList
+          keyExtractor={(groupId) => groupId}
+          data={groupIds}
+          renderItem={({ item }) => JoinGroupListItem(item)}
+        ></FlatList>
+        <View style={styles.horizontalItems}>
+          <Button
+            title="Create Group"
+            buttonStyle={styles.button}
+            onPress={() => navigation.navigate("Create Group")}
+          />
+          <Button
+            title="Sign Out"
+            type="outline"
+            buttonStyle={styles.button}
+            onPress={auth.userSignOut}
+          />
+        </View>
+      </View>
+    </Background>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
   },
   button: {
-    marginTop: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginLeft: 10,
+    borderRadius: 5,
+  },
+  text: {
+    color: "white",
+  },
+  listItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "lightgray",
+  },
+  horizontalItems: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
 });

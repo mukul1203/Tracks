@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { Button } from "react-native-elements";
+import { Icon } from "react-native-elements";
 import { useUsers } from "../utils/hooks/useUsers";
 import MapView, { Marker } from "react-native-maps";
 import { exitGroup } from "../utils/hooks/useGroup";
@@ -73,17 +73,6 @@ export default function MapScreen({
         <Text>{errorMsg}</Text>
       ) : (
         <View style={styles.container}>
-          <Button
-            title="Exit Group"
-            style={styles.button}
-            onPress={() => exitGroup(groupId)}
-          />
-          <Button
-            title="Auto Focus"
-            style={styles.button}
-            onPress={() => autoFocus()}
-          />
-          <Text>{Object.keys(allUsers).length}</Text>
           <MapView
             style={styles.map}
             region={region}
@@ -91,6 +80,21 @@ export default function MapScreen({
           >
             {getMarkers()}
           </MapView>
+          <Text style={styles.counter}>{Object.keys(allUsers).length}</Text>
+          <Icon
+            name="close"
+            type="material"
+            size={20}
+            containerStyle={styles.closeButton}
+            onPress={() => exitGroup(groupId)}
+          />
+          <Icon
+            name="crosshairs-gps"
+            type="material-community"
+            size={20}
+            containerStyle={styles.focusButton}
+            onPress={() => autoFocus()}
+          />
         </View>
       )}
     </View>
@@ -104,7 +108,20 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
-  button: {
-    marginTop: 10,
+  counter: {
+    position: "absolute",
+    top: "1%",
+    left: "1%",
+    backgroundColor: "yellow",
+  },
+  closeButton: {
+    position: "absolute",
+    top: "1%",
+    right: "1%",
+  },
+  focusButton: {
+    position: "absolute",
+    top: "5%",
+    right: "1%",
   },
 });

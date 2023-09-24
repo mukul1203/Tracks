@@ -117,11 +117,11 @@ const styles = StyleSheet.create({
   closeButton: {
     position: "absolute",
     top: "1%",
-    right: "1%",
+    right: "3%",
   },
   focusButton: {
     position: "absolute",
-    top: "5%",
-    right: "1%",
+    top: "7%",
+    right: "3%",
   },
 });

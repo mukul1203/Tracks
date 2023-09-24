@@ -2,15 +2,18 @@ import { useEffect, useState } from "react";
 import { useLocationEffect } from "./useLocationEffect";
 
 function getBoundingRegion(locations) {
-  const padding = 0.0001;
   const lats = locations.map((loc) => loc.latitude);
   const longs = locations.map((loc) => loc.longitude);
   const minLat = Math.min(...lats);
   const maxLat = Math.max(...lats);
   const minLong = Math.min(...longs);
   const maxLong = Math.max(...longs);
-  const latitudeDelta = maxLat - minLat + 2 * padding;
-  const longitudeDelta = maxLong - minLong + 2 * padding;
+  let latitudeDelta = maxLat - minLat;
+  let longitudeDelta = maxLong - minLong;
+  //padding should vary based on bounding box dimensions. So take a 5th of the longer side of the box.
+  const padding = Math.max(latitudeDelta, longitudeDelta) / 5;
+  latitudeDelta += padding;
+  longitudeDelta += padding;
   const latitude = (maxLat + minLat) / 2;
   const longitude = (maxLong + minLong) / 2;
   return { latitude, longitude, latitudeDelta, longitudeDelta };

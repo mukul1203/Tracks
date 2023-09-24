@@ -72,29 +72,26 @@ export default function MapScreen({
       {errorMsg ? (
         <Text>{errorMsg}</Text>
       ) : (
-        [
+        <View style={styles.container}>
           <Button
-            key="Exit Group"
             title="Exit Group"
             style={styles.button}
             onPress={() => exitGroup(groupId)}
-          />,
+          />
           <Button
-            key="Auto Focus"
             title="Auto Focus"
             style={styles.button}
             onPress={() => autoFocus()}
-          />,
-          <Text key="Counter">{Object.keys(allUsers).length}</Text>,
+          />
+          <Text>{Object.keys(allUsers).length}</Text>
           <MapView
-            key="Map"
             style={styles.map}
             region={region}
             onRegionChangeComplete={onRegionChangeComplete}
           >
             {getMarkers()}
-          </MapView>,
-        ]
+          </MapView>
+        </View>
       )}
     </View>
   );
@@ -105,8 +102,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   map: {
-    width: "100%",
-    height: "100%",
+    flex: 1,
   },
   button: {
     marginTop: 10,

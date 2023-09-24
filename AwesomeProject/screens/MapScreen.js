@@ -6,23 +6,15 @@ import MapView, { Marker } from "react-native-maps";
 import { exitGroup } from "../utils/hooks/useGroup";
 import { useMapRegion } from "../utils/hooks/useMapRegion";
 
-function getBackgroundColor(latitude, longitude) {
-  //TODO: this should be fixed for a given user!
-  // Normalize latitude and longitude values to the range [0, 1]
-  const normalizedLatitude = (latitude + 90) / 180;
-  const normalizedLongitude = (longitude + 180) / 360;
+function generateUniqueColor(inputString) {
+  let hash = 0;
+  for (let i = 0; i < inputString.length; i++) {
+    hash = inputString.charCodeAt(i) + ((hash << 5) - hash);
+  }
 
-  // Map location to hue (0 to 360 degrees)
-  const hue = normalizedLatitude * normalizedLongitude * 360;
-
-  // Set saturation and lightness values to constants or adjust as needed
-  const saturation = 70; // You can adjust this value
-  const lightness = 50; // You can adjust this value
-
-  // Convert HSL to RGB color
-  const hslColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-
-  return hslColor;
+  // Ensure the generated color has enough contrast with white background
+  const color = "#" + ((hash & 0xffffff) | 0xaaaaaa).toString(16);
+  return color;
 }
 
 export default function MapScreen({
@@ -62,7 +54,7 @@ export default function MapScreen({
                 width: 16,
                 height: 16,
                 borderRadius: 8, // Half of the width and height to make it circular
-                backgroundColor: getBackgroundColor(latitude, longitude),
+                backgroundColor: generateUniqueColor(userId),
                 justifyContent: "center",
                 alignItems: "center",
                 borderWidth: 3, // Add a border

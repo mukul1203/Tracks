@@ -3,9 +3,10 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Button, Input } from "react-native-elements";
 import { createGroup } from "../utils/hooks/useGroup";
 import { Background } from "./Background";
+import { auth } from "../services/auth";
 
 const CreateGroupScreen = function ({ navigation }) {
-  const [list, setList] = useState([]); //list of emails state
+  const [list, setList] = useState([auth.currentUser().email]); //list of emails state
   const [entry, setEntry] = useState(null); //input box state
   const keyExtractor = (item, index) => index.toString();
   const InviteListItem = (email) => (

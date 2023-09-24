@@ -18,9 +18,8 @@ export const createGroup = async (emails) => {
   await invite([...emails, auth.currentUser().email], key);
 };
 
-export const exitGroup = (groupId) => {
-  database.set("users/" + auth.currentUser().uid + "/groupId", null);
-  //TODO: also update the groups/groupId
+export const exitGroup = async (groupId) => {
+  return database.set("users/" + auth.currentUser().uid + "/groupId", null);
 };
 
 export const joinGroup = (groupId) => {
@@ -29,13 +28,22 @@ export const joinGroup = (groupId) => {
   database.set("users/" + auth.currentUser().uid + "/groupId", groupId);
 };
 
-export const deleteGroup = (groupId) => {
+export const deleteGroup = async (groupId) => {
   //remove the group from user's invite list
   //remove the group from groups list
-  //TODO: remove the group entry from every invite list of any user (how to?)
   //TODO: optimize by a single update call
-  database.set("users/" + auth.currentUser().uid + "/invites/" + groupId, null);
-  database.set("groups/" + groupId, null);
+  const groupStr = await database.get("groups/" + groupId);
+  const emails = JSON.parse(groupStr);
+  for (const emailId of emails) {
+    const users = await database.get("users/", ["email", "equals", emailId]);
+    for (const uid in users) {
+      if (users.hasOwnProperty(uid)) {
+        const update = { groupId: null, invites: { [groupId]: null } };
+        await database.update("users/" + uid, update);
+      }
+    }
+  }
+  return database.set("groups/" + groupId, null);
 };
 
 export function useGroup(init, setErrorMsg) {

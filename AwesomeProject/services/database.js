@@ -11,6 +11,7 @@ import {
   query,
   ref,
   set,
+  update,
 } from "firebase/database";
 
 const firebaseDB = getDatabase();
@@ -47,6 +48,9 @@ export const database = {
     return await get(getConstrainedPathRef(path, predicate)).then((data) =>
       data.exportVal()
     );
+  },
+  update: async function (path, updateObj) {
+    return await update(ref(firebaseDB, path), updateObj);
   },
   push: function (path) {
     const { key } = push(ref(firebaseDB, path));

@@ -1,5 +1,3 @@
-import { getAuth } from "firebase/auth";
-import { getDatabase } from "firebase/database";
 import { useEffect, useState } from "react";
 import { useLocationEffect } from "./useLocationEffect";
 

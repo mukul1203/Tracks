@@ -1,58 +1,45 @@
 import { useEffect, useState } from "react";
-import {
-  getDatabase,
-  ref,
-  update,
-  onChildAdded,
-  onChildChanged,
-  onChildRemoved,
-  query,
-  orderByChild,
-  equalTo,
-  set,
-} from "firebase/database";
-import { getAuth } from "firebase/auth";
-
-const database = getDatabase();
-const auth = getAuth();
+import { database } from "../../services/database";
+import { auth } from "../../services/auth";
 
 export const updateUser = async ({ latitude, longitude }) => {
   //send the data to DB
-  const updates = { latitude, longitude };
-  await update(ref(database, "/users/" + auth.currentUser.uid + "/"), updates);
+  await database.update("/users/" + auth.currentUser().uid + "/", {
+    latitude,
+    longitude,
+  });
 };
 
 export function useUsers(groupId, setErrorMsg) {
   const [allUsers, setAllUsers] = useState({});
 
   useEffect(() => {
-    const usersRef = query(
-      ref(database, "users/"),
-      orderByChild("groupId"),
-      equalTo(groupId)
-    );
-    const unsubscribeAdd = onChildAdded(
-      usersRef,
+    const usersPath = "users/";
+    const unsubscribeAdd = database.onChildAdded(
+      usersPath,
+      ["groupId", "equals", groupId],
       (data) => {
         setAllUsers((currentUsers) => ({
           ...currentUsers,
-          [data.key]: data.exportVal(),
+          [data.key]: data.val,
         }));
       },
       (error) => setErrorMsg(error.message)
     );
-    const unsubscribeChange = onChildChanged(
-      usersRef,
+    const unsubscribeChange = database.onChildChanged(
+      usersPath,
+      ["groupId", "equals", groupId],
       (data) => {
         setAllUsers((currentUsers) => ({
           ...currentUsers,
-          [data.key]: data.exportVal(),
+          [data.key]: data.val,
         }));
       },
       (error) => setErrorMsg(error.message)
     );
-    const unsubscribeRemove = onChildRemoved(
-      usersRef,
+    const unsubscribeRemove = database.onChildRemoved(
+      usersPath,
+      ["groupId", "equals", groupId],
       (data) => {
         setAllUsers((currentUsers) => {
           const { [data.key]: excluded, ...rest } = currentUsers;

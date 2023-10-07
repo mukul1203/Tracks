@@ -1,8 +1,9 @@
 import "dotenv/config";
 export default {
   expo: {
-    name: "AwesomeProject",
-    slug: "AwesomeProject",
+    name: "Tracks",
+    description: "Live location of a group of people on map",
+    slug: "Tracks",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/icon.png",
@@ -21,6 +22,7 @@ export default {
         foregroundImage: "./assets/adaptive-icon.png",
         backgroundColor: "#ffffff",
       },
+      package: "com.mukuluec.tracks",
     },
     web: {
       favicon: "./assets/favicon.png",
@@ -34,6 +36,9 @@ export default {
       firebaseAppId: process.env.FIREBASE_APP_ID,
       measurementId: process.env.FIREBASE_MEASUREMENT_ID,
       databaseURL: process.env.DATABASE_URL,
+      eas: {
+        projectId: "b41e62d7-2452-47a4-af34-ffb38a18a16e",
+      },
     },
   },
 };

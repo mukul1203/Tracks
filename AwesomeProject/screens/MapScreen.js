@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Icon } from "react-native-elements";
 import { useUsers } from "../utils/hooks/useUsers";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { exitGroup } from "../utils/hooks/useGroup";
 import { useMapRegion } from "../utils/hooks/useMapRegion";
 
@@ -74,6 +74,7 @@ export default function MapScreen({
       ) : (
         <View style={styles.container}>
           <MapView
+            provider={PROVIDER_GOOGLE}
             style={styles.map}
             region={region}
             onRegionChangeComplete={onRegionChangeComplete}

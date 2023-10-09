@@ -40,7 +40,7 @@ export default {
       measurementId: process.env.FIREBASE_MEASUREMENT_ID,
       databaseURL: process.env.DATABASE_URL,
       eas: {
-        projectId: "b41e62d7-2452-47a4-af34-ffb38a18a16e",
+        projectId: process.env.EAS_PROJECT_ID,
       },
     },
   },

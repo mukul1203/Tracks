@@ -30,6 +30,15 @@ export default {
     web: {
       favicon: "./assets/favicon.png",
     },
+    plugins: [
+      [
+        "expo-location",
+        {
+          isIosBackgroundLocationEnabled: true,
+          isAndroidBackgroundLocationEnabled: true,
+        },
+      ],
+    ],
     extra: {
       firebaseApiKey: process.env.FIREBASE_API_KEY,
       firebaseAuthDomain: process.env.FIREBASE_AUTH_DOMAIN,
@@ -40,7 +49,7 @@ export default {
       measurementId: process.env.FIREBASE_MEASUREMENT_ID,
       databaseURL: process.env.DATABASE_URL,
       eas: {
-        projectId: process.env.EAS_PROJECT_ID,
+        projectId: "b41e62d7-2452-47a4-af34-ffb38a18a16e",
       },
     },
   },

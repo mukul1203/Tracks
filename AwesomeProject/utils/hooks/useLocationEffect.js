@@ -27,7 +27,7 @@ export function useLocationEffect(setErrorMsg) {
         return;
       }
       return startLocationUpdatesAsync({
-        accuracy: Location.Accuracy.Highest,
+        accuracy: Location.Accuracy.BestForNavigation,
         distanceInterval: 5,
         timeInterval: 1000,
       });

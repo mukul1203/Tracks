@@ -10,10 +10,12 @@ import * as Location from "expo-location";
 
 const locationListeners = [];
 const unregisterListener = (fn) => {
+  console.log("Unregistering location listener");
   const index = locationListeners.findIndex((val, index) => val == fn);
   if (index != -1) locationListeners.splice(index, 1);
 };
 export const registerLocationListener = (fn) => {
+  console.log("Registering location listener");
   locationListeners.push(fn);
   return () => unregisterListener(fn);
 };
@@ -35,22 +37,29 @@ export const startLocationUpdatesAsync = async ({
   timeInterval,
   distanceInterval,
 }) => {
+  console.log("Start location updates async");
   await Location.startLocationUpdatesAsync(LOCATION_RECEIVER_TASK, {
     accuracy,
     timeInterval,
     distanceInterval,
     showsBackgroundLocationIndicator: true,
-    // foregroundService: {
-    //   notificationTitle: "Location Tracking",
-    //   notificationBody: "Tracking your location for routing purposes",
-    //   notificationColor: "#FF0000",
-    // },
+    //somehow foregroundService is needed to
+    //make background location tracking work
+    //REVISIT
+    foregroundService: {
+      notificationTitle: "Location Tracking",
+      notificationBody: "Tracking your location for routing purposes",
+      notificationColor: "#FF0000",
+    },
     pausesUpdatesAutomatically: false,
     deferredUpdatesInterval: 1000,
     deferredUpdatesDistance: 0,
     deferredUpdatesTimeout: 1000,
   });
-  return () => Location.stopLocationUpdatesAsync(LOCATION_RECEIVER_TASK);
+  return () => {
+    console.log("Stopping location updates async");
+    Location.stopLocationUpdatesAsync(LOCATION_RECEIVER_TASK);
+  };
 };
 
 export const requestLocationPermissions = async () => {

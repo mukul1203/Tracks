@@ -16,6 +16,7 @@ export default {
     assetBundlePatterns: ["**/*"],
     ios: {
       supportsTablet: true,
+      bundleIdentifier: "ios.mukuluec.tracks",
     },
     android: {
       adaptiveIcon: {

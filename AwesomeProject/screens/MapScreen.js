@@ -6,15 +6,18 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { exitGroup } from "../utils/hooks/useGroup";
 import { useMapRegion } from "../utils/hooks/useMapRegion";
 
+let color_cache;
 function generateUniqueColor(inputString) {
-  let hash = 0;
-  for (let i = 0; i < inputString.length; i++) {
-    hash = inputString.charCodeAt(i) + ((hash << 5) - hash);
+  if (!color_cache[inputString]) {
+    let hash = 0;
+    for (let i = 0; i < inputString.length; i++) {
+      hash = inputString.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    // Ensure the generated color has enough contrast with white background
+    const color = "#" + ((hash & 0xffffff) | 0xaaaaaa).toString(16);
+    color_cache[inputString] = color;
   }
-
-  // Ensure the generated color has enough contrast with white background
-  const color = "#" + ((hash & 0xffffff) | 0xaaaaaa).toString(16);
-  return color;
+  return color_cache[inputString];
 }
 
 export default function MapScreen({

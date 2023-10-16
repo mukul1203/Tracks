@@ -52,9 +52,9 @@ export const startLocationUpdatesAsync = async ({
       notificationColor: "#FF0000",
     },
     pausesUpdatesAutomatically: false,
-    deferredUpdatesInterval: 1000,
+    deferredUpdatesInterval: 0,
     deferredUpdatesDistance: 0,
-    deferredUpdatesTimeout: 1000,
+    deferredUpdatesTimeout: 0,
   });
   return () => {
     console.log("Stopping location updates async");

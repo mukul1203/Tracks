@@ -6,7 +6,7 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { exitGroup } from "../utils/hooks/useGroup";
 import { useMapRegion } from "../utils/hooks/useMapRegion";
 
-let color_cache;
+let color_cache = {};
 function generateUniqueColor(inputString) {
   if (!color_cache[inputString]) {
     let hash = 0;

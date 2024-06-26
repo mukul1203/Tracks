@@ -2,7 +2,7 @@ import { FlatList, StyleSheet, View, Text } from "react-native";
 import { useInvites } from "../utils/hooks/useInvites";
 import { deleteGroup, joinGroup } from "../utils/hooks/useGroup";
 import { auth } from "../services/auth";
-import { Background } from "./Background";
+import { Background } from "../components/Background";
 import { Button } from "react-native-elements";
 
 export default function SignedInScreen({ navigation }) {

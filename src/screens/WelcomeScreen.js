@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Button } from "react-native-elements";
-import { Background } from "./Background";
+import { Background } from "../components/Background";
 
 const WelcomeScreen = ({ navigation }) => {
   return (

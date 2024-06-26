@@ -1,6 +1,6 @@
 import * as Location from "expo-location";
 import { Button, Linking, StyleSheet, Text, View } from "react-native";
-import { Background } from "./Background";
+import { Background } from "../components/Background";
 
 export default function PermissionsScreen({ navigation }) {
   const [foreground, requestForeground] = Location.useForegroundPermissions();

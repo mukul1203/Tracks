@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Button, Input } from "react-native-elements";
 import { createGroup } from "../utils/hooks/useGroup";
-import { Background } from "./Background";
+import { Background } from "../components/Background";
 import { auth } from "../services/auth";
 
 const CreateGroupScreen = function ({ navigation }) {

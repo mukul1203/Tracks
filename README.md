@@ -31,6 +31,10 @@ To run on ios simulator, if you don't have any native code changes, best is to s
 To debug:
 Install the expo tools extension, it will provide a Debug expo app task. Use that to attach after running npx expo start > press s to switch to expo go > press i for ios simulator > launch Debug expo app task. Note that breakpoints are not correctly placed on the lines. Something above or below. Have to manage with this issue.
 
+EXPO_NO_CLIENT_ENV_VARS=1 npx expo start
+
+This flag will fix the displaced breakpoints issue. The displacement was due to inlining of environment variables in the bundle, which gets disabled by this flag. I guess this flag is necessary only for expo version 49 or so, not latest, but with latest expo, our app crashed during debugging, so can't move there yet.
+
 ( IGNORE THIS:
 Open launch.json file > Click Add configuration button > from dropdown, select React Native (you will have to have the React native tools extension downloaded) > Select Debug Application > Exponent > Hermes.
 Just click run button from the launch tasks dropdown now. You get an error about failed npm command.

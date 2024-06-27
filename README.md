@@ -34,6 +34,7 @@ Install the expo tools extension, it will provide a Debug expo app task. Use tha
 EXPO_NO_CLIENT_ENV_VARS=1 npx expo start
 
 This flag will fix the displaced breakpoints issue. The displacement was due to inlining of environment variables in the bundle, which gets disabled by this flag. I guess this flag is necessary only for expo version 49 or so, not latest, but with latest expo, our app crashed during debugging, so can't move there yet.
+Solution was on this link https://github.com/expo/vscode-expo/issues/226#issuecomment-1920080344
 
 ( IGNORE THIS:
 Open launch.json file > Click Add configuration button > from dropdown, select React Native (you will have to have the React native tools extension downloaded) > Select Debug Application > Exponent > Hermes.

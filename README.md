@@ -29,12 +29,8 @@ You can either have Expo Go app as the native app inside which to run your javas
 To run on ios simulator, if you don't have any native code changes, best is to switch to expo go mode (press s after you do npx expo start, then press i for ios simulator). This is because then, expo go will be installed on your ios simulator and your js code will be downloaded and run there. But if you are in development build with your custom eas build, you would need to download that build on simulator and then click your dev server in it and run (as usual on a physical device).
 
 To debug:
-Install the expo tools extension, it will provide a Debug expo app task. Use that to attach after running npx expo start > press s to switch to expo go > press i for ios simulator > launch Debug expo app task. Note that breakpoints are not correctly placed on the lines. Something above or below. Have to manage with this issue.
-
-EXPO_NO_CLIENT_ENV_VARS=1 npx expo start
-
-This flag will fix the displaced breakpoints issue. The displacement was due to inlining of environment variables in the bundle, which gets disabled by this flag. I guess this flag is necessary only for expo version 49 or so, not latest, but with latest expo, our app crashed during debugging, so can't move there yet.
-Solution was on this link https://github.com/expo/vscode-expo/issues/226#issuecomment-1920080344
+Install the expo tools extension, it will provide a "Debug Expo app" task. Use that to attach after running npx expo start > press s to switch to expo go > press i for ios simulator > launch Debug expo app task.
+npx expo start
 
 ( IGNORE THIS:
 Open launch.json file > Click Add configuration button > from dropdown, select React Native (you will have to have the React native tools extension downloaded) > Select Debug Application > Exponent > Hermes.

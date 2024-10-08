@@ -1,50 +1,37 @@
 import { FlatList, StyleSheet, View, Text } from "react-native";
 import { useInvites } from "../utils/hooks/useInvites";
-import { deleteGroup, joinGroup } from "../utils/hooks/useGroup";
-import { auth } from "../services/auth";
 import { Background } from "../components/Background";
 import { Button } from "react-native-elements";
+import { Invite } from "../components/Invite";
+import { getValueFromPath } from "../utils/data/selectors";
+import { INVITE_ID } from "../utils/data/paths";
+import { CREATE_GROUP_SCREEN_NAME } from "./screenConstants";
+import { userSignOut } from "../utils/data/actions";
 
 export default function SignedInScreen({ navigation }) {
-  const user = auth.currentUser();
-  const [groupIds] = useInvites([]);
-  const JoinGroupListItem = (groupId) => (
-    <View style={styles.listItem}>
-      <Text style={styles.text}>{groupId}</Text>
-      <Button
-        title="Join"
-        buttonStyle={styles.button}
-        onPress={() => joinGroup(groupId)}
-      />
-      <Button
-        title="Delete"
-        type="outline"
-        buttonStyle={styles.button}
-        onPress={() => deleteGroup(groupId)}
-      />
-    </View>
-  );
+  const { receivedInvites } = useInvites();
+  console.log("received invites");
+  console.log(receivedInvites);
   return (
     <Background>
       <View style={styles.container}>
-        {/* <Text style={styles.text}>Welcome {user?.email}!</Text> */}
-        <Text style={{ ...styles.text, fontSize: 18 }}>Group Invites</Text>
+        <Text style={{ ...styles.text, fontSize: 18 }}>Invites received</Text>
         <FlatList
-          keyExtractor={(groupId) => groupId}
-          data={groupIds}
-          renderItem={({ item }) => JoinGroupListItem(item)}
+          keyExtractor={(invite) => getValueFromPath(invite, INVITE_ID)}
+          data={receivedInvites}
+          renderItem={({ item }) => <Invite invite={item} />}
         ></FlatList>
         <View style={styles.horizontalItems}>
           <Button
             title="Create Group"
             buttonStyle={styles.button}
-            onPress={() => navigation.navigate("Create Group")}
+            onPress={() => navigation.navigate(CREATE_GROUP_SCREEN_NAME)}
           />
           <Button
             title="Sign Out"
             type="outline"
             buttonStyle={styles.button}
-            onPress={auth.userSignOut}
+            onPress={userSignOut}
           />
         </View>
       </View>

@@ -1,13 +1,14 @@
 import * as Location from "expo-location";
 import { Button, Linking, StyleSheet, Text, View } from "react-native";
 import { Background } from "../components/Background";
+import { WELCOME_SCREEN_NAME } from "./screenConstants";
 
 export default function PermissionsScreen({ navigation }) {
   const [foreground, requestForeground] = Location.useForegroundPermissions();
   const [background, requestBackground] = Location.useBackgroundPermissions();
 
   if (foreground?.granted && background?.granted) {
-    navigation.navigate("Welcome");
+    navigation.navigate(WELCOME_SCREEN_NAME);
     return;
   }
   // In this example, we follow a couple of rules for the permissions

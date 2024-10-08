@@ -5,26 +5,20 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { database } from "./database";
 const firebaseAuth = getAuth();
 export const auth = {
-  userSignIn: async function (email, password) {
+  userSignIn: async function (name, email, password) {
     if (email === "" || password === "") {
       throw new Error("Email and password are mandatory.");
     }
     try {
       await signInWithEmailAndPassword(firebaseAuth, email, password);
-      //Make the user entry in db here
-      await database.set(
-        "/users/" + firebaseAuth.currentUser.uid + "/email",
-        email
-      );
     } catch (error) {
       throw error;
     }
   },
   userSignOut: async function () {
-    return signOut(firebaseAuth);
+    await signOut(firebaseAuth);
   },
   userSignUp: async function (email, password) {
     if (email === "" || password === "") {
@@ -39,7 +33,10 @@ export const auth = {
   onUserAuthStateChanged: function (callback) {
     return onAuthStateChanged(firebaseAuth, callback);
   },
-  currentUser: function () {
-    return firebaseAuth.currentUser;
+  currentUserId: function () {
+    return firebaseAuth.currentUser.uid;
+  },
+  currentUserEmail: function () {
+    return firebaseAuth.currentUser.email;
   },
 };

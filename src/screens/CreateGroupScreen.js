@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Button, Input } from "react-native-elements";
-import { createGroup } from "../utils/hooks/useGroup";
 import { Background } from "../components/Background";
 import { auth } from "../services/auth";
+import { createGroup } from "../utils/data/actions";
+import { SIGNED_IN_SCREEN_NAME } from "./screenConstants";
 
 const CreateGroupScreen = function ({ navigation }) {
-  const [list, setList] = useState([auth.currentUser().email]); //list of emails state
+  const [list, setList] = useState([auth.currentUserEmail()]); //list of emails state
   const [entry, setEntry] = useState(null); //input box state
+  const [groupName, setGroupName] = useState("");
   const keyExtractor = (item, index) => index.toString();
   const InviteListItem = (email) => (
     <View style={styles.listItem}>
@@ -26,6 +28,12 @@ const CreateGroupScreen = function ({ navigation }) {
         <Text style={{ ...styles.text, fontSize: 18 }}>
           Invite participants
         </Text>
+        <Input
+          placeholder="Group name"
+          value={groupName}
+          onChangeText={setGroupName}
+          style={styles.text}
+        ></Input>
         <Input
           placeholder="Email of participant"
           value={entry}
@@ -51,7 +59,8 @@ const CreateGroupScreen = function ({ navigation }) {
           title="Done"
           buttonStyle={styles.button}
           onPress={() => {
-            createGroup(list);
+            createGroup(list, groupName);
+            navigation.navigate(SIGNED_IN_SCREEN_NAME);
           }}
         ></Button>
       </View>

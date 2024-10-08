@@ -5,7 +5,11 @@ import { createStackNavigator } from "@react-navigation/stack";
 import WelcomeScreen from "../screens/WelcomeScreen";
 import SignInScreen from "../screens/SignInScreen";
 import SignUpScreen from "../screens/SignUpScreen";
-import PermissionsScreen from "../screens/PermissionsScreen";
+import {
+  SIGNIN_SCREEN_NAME,
+  SIGNUP_SCREEN_NAME,
+  WELCOME_SCREEN_NAME,
+} from "../screens/screenConstants";
 
 const Stack = createStackNavigator();
 
@@ -13,10 +17,9 @@ export default function AuthStack() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {/* <Stack.Screen name="Permissions" component={PermissionsScreen} /> */}
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
-        <Stack.Screen name="Sign In" component={SignInScreen} />
-        <Stack.Screen name="Sign Up" component={SignUpScreen} />
+        <Stack.Screen name={WELCOME_SCREEN_NAME} component={WelcomeScreen} />
+        <Stack.Screen name={SIGNIN_SCREEN_NAME} component={SignInScreen} />
+        <Stack.Screen name={SIGNUP_SCREEN_NAME} component={SignUpScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

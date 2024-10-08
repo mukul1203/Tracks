@@ -1,21 +1,11 @@
 import * as Location from "expo-location";
 import { useEffect } from "react";
-import { updateUser } from "./useUsers";
 import {
   registerLocationListener,
   requestLocationPermissions,
   startLocationUpdatesAsync,
 } from "../../services/location";
-
-export async function updateUserLocationInDB(latitude, longitude) {
-  try {
-    await updateUser({ latitude, longitude });
-  } catch (error) {
-    let errorMsg = "Update to db failed! " + error.message;
-    return { errorMsg };
-  }
-  return {};
-}
+import { updateUserLocationInDB } from "../data/actions";
 
 export function useLocationEffect(setErrorMsg) {
   useEffect(() => {

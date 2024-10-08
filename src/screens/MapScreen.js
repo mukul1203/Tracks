@@ -3,8 +3,8 @@ import { StyleSheet, Text, View } from "react-native";
 import { Icon } from "react-native-elements";
 import { useUsers } from "../utils/hooks/useUsers";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import { exitGroup } from "../utils/hooks/useGroup";
 import { useMapRegion } from "../utils/hooks/useMapRegion";
+import { exitGroup } from "../utils/data/actions";
 
 let color_cache = {};
 function generateUniqueColor(inputString) {

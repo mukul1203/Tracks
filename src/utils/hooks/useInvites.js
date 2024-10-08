@@ -1,48 +1,61 @@
 import { useEffect, useState } from "react";
 import { database } from "../../services/database";
 import { auth } from "../../services/auth";
+import {
+  INVITE_ID,
+  INVITE_SENT_BY,
+  INVITE_SENT_TO,
+  INVITES,
+} from "../data/paths";
+import { getCurrentUserId, getValueFromPath } from "../data/selectors";
 
-// import { firebaseKeyCodec } from "../firebaseKeyCodec";
+// function useSentInvites(init, setErrorMsg) {
+//   const [invites, setInvites] = useState(init);
+//   useEffect(() => {
+//     const unsubscribeAdd = database.onChildAdded(
+//       INVITES,
+//       [INVITE_SENT_BY.substring(1), "equals", auth.currentUserId()],
+//       ({ key, val }) => {
+//         setInvites((invites) => [...invites, val]);
+//       },
+//       (error) => setErrorMsg(error.message)
+//     );
+//     const unsubscribeRemove = database.onChildRemoved(
+//       INVITES,
+//       [INVITE_SENT_BY.substring(1), "equals", auth.currentUserId()],
+//       ({ key, val }) => {
+//         setInvites((invites) =>
+//           invites.filter((elem) => elem.sent_to != val.sent_to)
+//         );
+//       },
+//       (error) => setErrorMsg(error.message)
+//     );
+//     return () => {
+//       unsubscribeAdd();
+//       unsubscribeRemove();
+//     };
+//   }, []);
+//   return invites;
+// }
 
-// Invite given emails to the given group
-export async function invite(emails, groupId) {
-  //TODO: optimize. First fetch all users, then batch the updates using update()
-  for (let i = 0; i < emails.length; i++) {
-    await database
-      .get("users/", ["email", "equals", emails[i]])
-      .then((users) => {
-        const userIds = Object.keys(users); //There should be only one userId with given email
-        if (userIds.length == 1)
-          return database.set(
-            "users/" + userIds[0] + "/invites/" + groupId,
-            true
-          );
-      })
-      .catch((error) => {
-        //user with given email not found in users/
-        //If we don't catch, none of the users get invites due to error thrown
-        console.log(error.message);
-      });
-  }
-}
-
-export function useInvites(init, setErrorMsg) {
-  const [invites, setInvites] = useState(init);
+function useReceivedInvites(setErrorMsg) {
+  const [invites, setInvites] = useState([]);
   useEffect(() => {
-    const invitesPath = "users/" + auth.currentUser().uid + "/invites/";
     const unsubscribeAdd = database.onChildAdded(
-      invitesPath,
-      [],
+      INVITES,
+      [INVITE_SENT_TO.substring(1), "equals", auth.currentUserId()],
       ({ key, val }) => {
-        setInvites((invites) => [...invites, key]);
+        setInvites((invites) => [...invites, val]);
       },
       (error) => setErrorMsg(error.message)
     );
     const unsubscribeRemove = database.onChildRemoved(
-      invitesPath,
-      [],
+      INVITES,
+      [INVITE_SENT_TO.substring(1), "equals", auth.currentUserId()],
       ({ key, val }) => {
-        setInvites((invites) => invites.filter((elem) => elem != key));
+        setInvites((invites) =>
+          invites.filter((elem) => getValueFromPath(elem, INVITE_ID) != key)
+        );
       },
       (error) => setErrorMsg(error.message)
     );
@@ -50,21 +63,13 @@ export function useInvites(init, setErrorMsg) {
       unsubscribeAdd();
       unsubscribeRemove();
     };
-
-    // const groupsRef = query(ref(database, 'groups/'), orderByChild(firebaseKeyCodec.encodeFully(auth.currentUser.email)), equalTo(true));
-    // const unsubscribeAdd = onChildAdded(groupsRef, (data)=>{
-    //     setInvites((invites)=>({...invites, [data.key]:data.exportVal()}));
-    // });
-    // const unsubscribeChange = onChildChanged(groupsRef, (data)=>{
-    //     setInvites((invites)=>({...invites, [data.key]:data.exportVal()}));
-    // });
-    // const unsubscribeRemove = onChildRemoved(groupsRef, (data)=>{
-    //     setInvites((invites)=>{
-    //         const {[data.key]:excluded, ...rest} = invites;
-    //         return rest;
-    //     });
-    // });
-    // return ()=>{ unsubscribeAdd(); unsubscribeChange(); unsubscribeRemove(); }
   }, []);
   return [invites];
 }
+
+export const useInvites = (setErrorMsg) => {
+  const [invites] = useReceivedInvites(setErrorMsg);
+  return {
+    receivedInvites: invites,
+  };
+};

@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Button } from "react-native-elements";
 import { Background } from "../components/Background";
+import { SIGNIN_SCREEN_NAME, SIGNUP_SCREEN_NAME } from "./screenConstants";
 
 const WelcomeScreen = ({ navigation }) => {
   return (
@@ -11,13 +12,13 @@ const WelcomeScreen = ({ navigation }) => {
           <Button
             title="Sign in"
             buttonStyle={styles.button}
-            onPress={() => navigation.navigate("Sign In")}
+            onPress={() => navigation.navigate(SIGNIN_SCREEN_NAME)}
           />
           <Button
             title="Sign up"
             type="outline"
             buttonStyle={styles.button}
-            onPress={() => navigation.navigate("Sign Up")}
+            onPress={() => navigation.navigate(SIGNUP_SCREEN_NAME)}
           />
         </View>
       </View>

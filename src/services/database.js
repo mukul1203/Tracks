@@ -38,24 +38,27 @@ function getConstrainedPathRef(path, predicate) {
 }
 
 export const database = {
-  //observe a path for changes (like addition/deletion of children, modification of value )
   //set a value to path
   set: async function (path, value) {
     return await set(ref(firebaseDB, path), value);
   },
+  //get data at the given path, but consisting only of the children satisfying given predicate
   get: async function (path, predicate = []) {
     //assuming data is object
     return await get(getConstrainedPathRef(path, predicate)).then((data) =>
       data.exportVal()
     );
   },
+  //update data at given path with given update object
   update: async function (path, updateObj) {
     return await update(ref(firebaseDB, path), updateObj);
   },
+  //create a unique child entry in the given path. Firebase will generate a unique key and this method returns that key.
   push: function (path) {
     const { key } = push(ref(firebaseDB, path));
     return { key };
   },
+  //listen for data changes at given path. Callback receives the data at the path in case of any changes.
   onValue: function (path, callback, errorCallback) {
     return onValue(
       ref(firebaseDB, path),
@@ -63,6 +66,9 @@ export const database = {
       errorCallback
     );
   },
+
+  //observable collection - observe for addition/deletion/update of a child in the collection
+
   //predicate is an array of [attribute, operator, value], telling that listen to children at
   //given path, ONLY those that fullfil the predicate i.e. whose given attribute (string) is 'operator' (e.g. "equals")
   //value.

@@ -1,23 +1,14 @@
 import { useEffect, useState } from "react";
 import { database } from "../../services/database";
-import { auth } from "../../services/auth";
-
-export const updateUser = async ({ latitude, longitude }) => {
-  //send the data to DB
-  await database.update("/users/" + auth.currentUser().uid + "/", {
-    latitude,
-    longitude,
-  });
-};
+import { USER_ACTIVE_GROUP, USERS } from "../data/paths";
 
 export function useUsers(groupId, setErrorMsg) {
   const [allUsers, setAllUsers] = useState({});
 
   useEffect(() => {
-    const usersPath = "users/";
     const unsubscribeAdd = database.onChildAdded(
-      usersPath,
-      ["groupId", "equals", groupId],
+      USERS,
+      [USER_ACTIVE_GROUP.substring(1), "equals", groupId],
       (data) => {
         setAllUsers((currentUsers) => ({
           ...currentUsers,
@@ -27,8 +18,8 @@ export function useUsers(groupId, setErrorMsg) {
       (error) => setErrorMsg(error.message)
     );
     const unsubscribeChange = database.onChildChanged(
-      usersPath,
-      ["groupId", "equals", groupId],
+      USERS,
+      [USER_ACTIVE_GROUP.substring(1), "equals", groupId],
       (data) => {
         setAllUsers((currentUsers) => ({
           ...currentUsers,
@@ -38,8 +29,8 @@ export function useUsers(groupId, setErrorMsg) {
       (error) => setErrorMsg(error.message)
     );
     const unsubscribeRemove = database.onChildRemoved(
-      usersPath,
-      ["groupId", "equals", groupId],
+      USERS,
+      [USER_ACTIVE_GROUP.substring(1), "equals", groupId],
       (data) => {
         setAllUsers((currentUsers) => {
           const { [data.key]: excluded, ...rest } = currentUsers;

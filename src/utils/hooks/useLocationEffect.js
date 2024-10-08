@@ -5,7 +5,7 @@ import {
   requestLocationPermissions,
   startLocationUpdatesAsync,
 } from "../../services/location";
-import { updateUserLocationInDB } from "../data/actions";
+import { updateUserLocation } from "../data/actions";
 
 export function useLocationEffect(setErrorMsg) {
   useEffect(() => {
@@ -24,11 +24,12 @@ export function useLocationEffect(setErrorMsg) {
     })();
     const unregisterLocationListener = registerLocationListener(
       async (latitude, longitude, error) => {
+        console.log(`latitude:${latitude} longitude:${longitude}`);
         if (error?.message) {
           setErrorMsg(errorMsg);
           return;
         }
-        const { errorMsg } = await updateUserLocationInDB(latitude, longitude);
+        const { errorMsg } = await updateUserLocation(latitude, longitude);
         if (errorMsg) setErrorMsg(errorMsg);
       }
     );

@@ -5,7 +5,6 @@ import { Button, Input } from "react-native-elements";
 
 export const EmailPasswordInput = ({ title, onDonePress }) => {
   const [value, setValue] = React.useState({
-    name: "",
     email: "",
     password: "",
     error: "",
@@ -19,14 +18,6 @@ export const EmailPasswordInput = ({ title, onDonePress }) => {
         </View>
       )}
       <View style={styles.controls}>
-        <Input
-          placeholder="Name"
-          containerStyle={styles.control}
-          style={styles.text}
-          value={value.name}
-          onChangeText={(text) => setValue({ ...value, name: text })}
-          leftIcon={<Icon name="user" size={16} color="white" />}
-        />
         <Input
           placeholder="Email"
           containerStyle={styles.control}
@@ -50,7 +41,7 @@ export const EmailPasswordInput = ({ title, onDonePress }) => {
           buttonStyle={styles.control}
           onPress={async () => {
             try {
-              await onDonePress(value.name, value.email, value.password);
+              await onDonePress(value.email, value.password);
             } catch (error) {
               setValue({
                 ...value,

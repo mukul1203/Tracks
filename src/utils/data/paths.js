@@ -9,14 +9,16 @@
       "members": {
         "uid_1": true,
         "uid_2": false
-      }
+      },
+      "id": "group_id_1"
     },
     "group_id_2": {
       "name": "Group 2",
       "createdBy": "uid_2",
       "members": {
         "uid_2": true
-      }
+      },
+      "id": "group_id_2"
     }
   }
 }
@@ -30,13 +32,17 @@
       "email": "user1@example.com",
       "latitude": 22.45,
       "longitude": 35.454,
-      "groupId": "group_id_1"
+      "groupId": "group_id_1",
+      "name": "Jack",
+      "id": "uid_1"
     },
     "uid_2": {
       "email": "user2@example.com",
       "latitude": 223.45,
       "longitude": 335.454,
-      "groupId": "group_id_2"
+      "groupId": "group_id_2",
+      "name": "Jill",
+      "id": "uid_2"
     }
   }
 }
@@ -49,13 +55,15 @@
       "group_id": "group_id_1",
       "sent_to": "uid_2",
       "sent_by": "uid_1",
-      "status": "pending"
+      "status": "pending",
+      "id": "invite_id_2"
     },
     "invite_id_2": {
       "group_id": "group_id_1",
       "sent_to": "uid_3",
       "sent_by": "uid_1",
-      "status": "accepted"
+      "status": "accepted",
+      "id": "invite_id_2"
     }
   }
 }

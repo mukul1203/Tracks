@@ -7,7 +7,7 @@ import {
 } from "firebase/auth";
 const firebaseAuth = getAuth();
 export const auth = {
-  userSignIn: async function (name, email, password) {
+  userSignIn: async function (email, password) {
     if (email === "" || password === "") {
       throw new Error("Email and password are mandatory.");
     }

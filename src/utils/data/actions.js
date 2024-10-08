@@ -14,17 +14,21 @@ import { getInvitesToGroup, getUsersWithActiveGroup } from "./selectors";
 
 /***************** Users *******************/
 
-export const userSignIn = async (name, email, password) => {
-  await auth.userSignIn(name, email, password);
-  //Make the user entry in db here
-  await createUser(name, auth.currentUserEmail(), auth.currentUserId());
+export const userSignIn = async (email, password) => {
+  await auth.userSignIn(email, password);
 };
 
 export const userSignOut = async () => {
   const userId = auth.currentUserId();
   await auth.userSignOut();
-  // Note: this only removes the user entry from db. This doesn't delete the user per se. That is done via deleteUser of firebase.
-  await removeUser(userId);
+  await deleteUserSessionData(userId);
+};
+
+export const userSignUp = async (name, email, password) => {
+  // This will create a user account and also sign in the user on successful account creation
+  await auth.userSignUp(email, password);
+  //Make the user entry in db here
+  await createUser(name, auth.currentUserEmail(), auth.currentUserId());
 };
 
 const createUser = async (name, email, userId) => {
@@ -34,9 +38,30 @@ const createUser = async (name, email, userId) => {
   await database.set(USERS + "/" + userId, user);
 };
 
-const removeUser = async (userId) => {
-  await database.set(USERS + "/" + userId, null);
+const deleteUserSessionData = async (userId) => {
+  const user = {
+    [USER_LATITUDE.substring(1)]: null,
+    [USER_LONGITUDE.substring(1)]: null,
+    [USER_ACTIVE_GROUP.substring(1)]: null,
+  };
+  await database.update(USERS + "/" + userId, user);
 };
+
+/***************** Location *******************/
+
+export async function updateUserLocation(latitude, longitude) {
+  try {
+    //send the data to DB
+    await database.update(USERS + "/" + auth.currentUserId(), {
+      [USER_LATITUDE.substring(1)]: latitude,
+      [USER_LONGITUDE.substring(1)]: longitude,
+    });
+  } catch (error) {
+    let errorMsg = "Update to db failed! " + error.message;
+    return { errorMsg };
+  }
+  return {};
+}
 /***************** Invites *******************/
 
 // Invite given emails to the given group
@@ -107,23 +132,3 @@ export const deleteGroup = async (groupId) => {
   }
   await database.set(GROUPS + "/" + groupId, null);
 };
-
-/***************** Location *******************/
-
-export const updateUser = async ({ latitude, longitude }) => {
-  //send the data to DB
-  await database.update(USERS + "/" + auth.currentUserId() + "/", {
-    [USER_LATITUDE]: latitude,
-    [USER_LONGITUDE]: longitude,
-  });
-};
-
-export async function updateUserLocationInDB(latitude, longitude) {
-  try {
-    await updateUser({ latitude, longitude });
-  } catch (error) {
-    let errorMsg = "Update to db failed! " + error.message;
-    return { errorMsg };
-  }
-  return {};
-}

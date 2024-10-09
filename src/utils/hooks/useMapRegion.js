@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocationEffect } from "./useLocationEffect";
+import { getValueFromPath } from "../data/selectors";
+import { USER_LATITUDE, USER_LONGITUDE } from "../data/paths";
 
 function getBoundingRegion(locations) {
   const lats = locations.map((loc) => loc.latitude);
@@ -30,9 +32,9 @@ export function useMapRegion(users, setErrorMsg) {
     longitudeDelta: 10.0421,
   });
   const [] = useLocationEffect(setErrorMsg); //TODO: remove this
-  const locations = Object.keys(users).map((key) => {
-    //user entry may not yet have lat long values, so default to 0
-    const { latitude = 0, longitude = 0 } = users[key];
+  const locations = Object.values(users).map((user) => {
+    const latitude = getValueFromPath(user, USER_LATITUDE);
+    const longitude = getValueFromPath(user, USER_LONGITUDE);
     return { latitude, longitude };
   });
   useEffect(() => {

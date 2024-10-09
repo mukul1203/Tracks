@@ -5,6 +5,14 @@ import { useUsers } from "../utils/hooks/useUsers";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useMapRegion } from "../utils/hooks/useMapRegion";
 import { exitGroup } from "../utils/data/actions";
+import { getValueFromPath } from "../utils/data/selectors";
+import {
+  USER_EMAIL,
+  USER_ID,
+  USER_LATITUDE,
+  USER_LONGITUDE,
+  USER_NAME,
+} from "../utils/data/paths";
 
 let color_cache = {};
 function generateUniqueColor(inputString) {
@@ -41,34 +49,34 @@ export default function MapScreen({
   });
 
   const getMarkers = () => {
-    let markers = [];
-    for (let userId in allUsers) {
-      if (allUsers.hasOwnProperty(userId)) {
-        const { latitude = 0, longitude = 0, email } = allUsers[userId];
-        markers.push(
-          <Marker
-            coordinate={{ latitude, longitude }}
-            title={email}
-            description={JSON.stringify({ latitude, longitude })}
-            key={userId}
-          >
-            <View
-              style={{
-                width: 16,
-                height: 16,
-                borderRadius: 8, // Half of the width and height to make it circular
-                backgroundColor: generateUniqueColor(userId),
-                justifyContent: "center",
-                alignItems: "center",
-                borderWidth: 3, // Add a border
-                borderColor: "black", // Border color
-              }}
-            ></View>
-          </Marker>
-        );
-      }
-    }
-    return markers;
+    return Object.values(allUsers).map((user) => {
+      const latitude = getValueFromPath(user, USER_LATITUDE);
+      const longitude = getValueFromPath(user, USER_LONGITUDE);
+      const name = getValueFromPath(user, USER_NAME);
+      const email = getValueFromPath(user, USER_EMAIL);
+      const userId = getValueFromPath(user, USER_ID);
+      return (
+        <Marker
+          coordinate={{ latitude, longitude }}
+          title={`${name}(${email})`}
+          description={`${latitude}, ${longitude}`}
+          key={userId}
+        >
+          <View
+            style={{
+              width: 16,
+              height: 16,
+              borderRadius: 8, // Half of the width and height to make it circular
+              backgroundColor: generateUniqueColor(userId),
+              justifyContent: "center",
+              alignItems: "center",
+              borderWidth: 3, // Add a border
+              borderColor: "black", // Border color
+            }}
+          ></View>
+        </Marker>
+      );
+    });
   };
   return (
     <View style={styles.container}>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { database } from "../../services/database";
 import { USER_ACTIVE_GROUP, USERS } from "../data/paths";
 
+// returns an OBJECT (not array) of users in the group
 export function useUsers(groupId, setErrorMsg) {
   const [allUsers, setAllUsers] = useState({});
 

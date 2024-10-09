@@ -5,21 +5,26 @@ import { Background } from "../components/Background";
 import { auth } from "../services/auth";
 import { createGroup } from "../utils/data/actions";
 import { SIGNED_IN_SCREEN_NAME } from "./screenConstants";
+import { getUserFromEmail } from "../utils/data/selectors";
 
 const CreateGroupScreen = function ({ navigation }) {
   const [list, setList] = useState([auth.currentUserEmail()]); //list of emails state
-  const [entry, setEntry] = useState(null); //input box state
+  const [entry, setEntry] = useState(""); //input box state
   const [groupName, setGroupName] = useState("");
   const keyExtractor = (item, index) => index.toString();
   const InviteListItem = (email) => (
     <View style={styles.listItem}>
       <Text style={styles.text}>{email}</Text>
-      <Button
-        title="Delete"
-        type="outline"
-        buttonStyle={styles.button}
-        onPress={() => setList((list) => list.filter((item) => item != email))}
-      />
+      {email != auth.currentUserEmail() && (
+        <Button
+          title="Delete"
+          type="outline"
+          buttonStyle={styles.button}
+          onPress={() =>
+            setList((list) => list.filter((item) => item != email))
+          }
+        />
+      )}
     </View>
   );
   return (
@@ -33,6 +38,7 @@ const CreateGroupScreen = function ({ navigation }) {
           value={groupName}
           onChangeText={setGroupName}
           style={styles.text}
+          errorMessage={!groupName && "Group name is mandatory"}
         ></Input>
         <Input
           placeholder="Email of participant"
@@ -43,10 +49,17 @@ const CreateGroupScreen = function ({ navigation }) {
         <Button
           title="Add"
           buttonStyle={styles.button}
-          onPress={() => {
-            if (entry) {
-              setList([...list, entry]);
-              setEntry(null);
+          onPress={async () => {
+            // Only if entry is non empty, not duplicate and a user with given email is found
+            // TODO: throw relevant errors here to notify user
+            const normalizedEntry = entry?.toLowerCase();
+            if (
+              normalizedEntry &&
+              !list.includes(normalizedEntry) &&
+              (await getUserFromEmail(normalizedEntry))
+            ) {
+              setList([...list, normalizedEntry]);
+              setEntry("");
             }
           }}
         ></Button>
@@ -59,8 +72,10 @@ const CreateGroupScreen = function ({ navigation }) {
           title="Done"
           buttonStyle={styles.button}
           onPress={() => {
-            createGroup(list, groupName);
-            navigation.navigate(SIGNED_IN_SCREEN_NAME);
+            if (groupName) {
+              createGroup(list, groupName);
+              navigation.navigate(SIGNED_IN_SCREEN_NAME);
+            }
           }}
         ></Button>
       </View>

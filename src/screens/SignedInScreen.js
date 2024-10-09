@@ -17,6 +17,9 @@ export default function SignedInScreen({ navigation }) {
       <View style={styles.container}>
         <Text style={{ ...styles.text, fontSize: 18 }}>Invites received</Text>
         <FlatList
+          flexGrow={1}
+          showsVerticalScrollIndicator={true}
+          showsHorizontalScrollIndicator={false}
           keyExtractor={(invite) => getValueFromPath(invite, INVITE_ID)}
           data={receivedInvites}
           renderItem={({ item }) => <Invite invite={item} />}

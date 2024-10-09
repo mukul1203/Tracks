@@ -1,12 +1,17 @@
 import React from "react";
 import { View, ImageBackground, StyleSheet } from "react-native";
 
-export const Background = ({ children }) => {
+export const Background = ({
+  children
+}: any) => {
   return (
     <ImageBackground
+      // @ts-expect-error TS(2304): Cannot find name 'source'.
       source={require("../assets/earth.jpeg")} // Replace with your image source
+      // @ts-expect-error TS(2552): Cannot find name 'style'. Did you mean 'styles'?
       style={styles.backgroundImage}
     >
+      // @ts-expect-error TS(2552): Cannot find name 'style'. Did you mean 'styles'?
       <View style={styles.overlay}>{children}</View>
     </ImageBackground>
   );

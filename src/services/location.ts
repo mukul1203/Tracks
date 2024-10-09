@@ -8,13 +8,14 @@ import * as Location from "expo-location";
 //we need to spin up your JavaScript app, run your task and then shut down —
 //no views are mounted in this scenario.
 
-const locationListeners = [];
-const unregisterListener = (fn) => {
+const locationListeners: any = [];
+const unregisterListener = (fn: any) => {
   console.log("Unregistering location listener");
+  // @ts-expect-error TS(7006): Parameter 'val' implicitly has an 'any' type.
   const index = locationListeners.findIndex((val, index) => val == fn);
   if (index != -1) locationListeners.splice(index, 1);
 };
-export const registerLocationListener = (fn) => {
+export const registerLocationListener = (fn: any) => {
   console.log("Registering location listener");
   locationListeners.push(fn);
   return () => unregisterListener(fn);
@@ -23,11 +24,13 @@ export const registerLocationListener = (fn) => {
 const LOCATION_RECEIVER_TASK = "mainLocationReceiver";
 TaskManager.defineTask(
   LOCATION_RECEIVER_TASK,
+  // @ts-expect-error TS(2339): Property 'locations' does not exist on type 'unkno... Remove this comment to see the full error message
   ({ data: { locations }, error }) => {
     const {
       coords: { latitude, longitude },
     } = locations[0];
     console.log(`latitude: ${latitude}, longitude:${longitude}`);
+    // @ts-expect-error TS(7006): Parameter 'fn' implicitly has an 'any' type.
     locationListeners.forEach((fn) => fn(latitude, longitude, error));
   }
 );
@@ -35,8 +38,8 @@ TaskManager.defineTask(
 export const startLocationUpdatesAsync = async ({
   accuracy,
   timeInterval,
-  distanceInterval,
-}) => {
+  distanceInterval
+}: any) => {
   console.log("Start location updates async");
   await Location.startLocationUpdatesAsync(LOCATION_RECEIVER_TASK, {
     accuracy,
@@ -65,6 +68,7 @@ export const startLocationUpdatesAsync = async ({
 export const requestLocationPermissions = async () => {
   let errorMsg = null;
   let bgResponse;
+  // @ts-expect-error TS(2554): Expected 0 arguments, but got 1.
   const fgResponse = await Location.requestForegroundPermissionsAsync({});
   const { granted: fgGranted, status: fgStatus } = fgResponse;
 

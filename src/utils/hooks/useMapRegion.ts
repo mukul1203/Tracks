@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useLocationEffect } from "./useLocationEffect";
 
-function getBoundingRegion(locations) {
-  const lats = locations.map((loc) => loc.latitude);
-  const longs = locations.map((loc) => loc.longitude);
+function getBoundingRegion(locations: any) {
+  const lats = locations.map((loc: any) => loc.latitude);
+  const longs = locations.map((loc: any) => loc.longitude);
   const minLat = Math.min(...lats);
   const maxLat = Math.max(...lats);
   const minLong = Math.min(...longs);
@@ -21,7 +21,7 @@ function getBoundingRegion(locations) {
 //ReadWrite hook state
 //Maintains a state: region of map to be focussed
 //Depends on the various users being shown on map
-export function useMapRegion(users, setErrorMsg) {
+export function useMapRegion(users: any, setErrorMsg: any) {
   const [userOverridden, setUserOverridden] = useState(false);
   const [region, setRegion] = useState({
     latitude: 0,
@@ -40,7 +40,7 @@ export function useMapRegion(users, setErrorMsg) {
       setRegion(getBoundingRegion(locations));
   }, [JSON.stringify(locations), userOverridden]);
 
-  const customSetRegion = (region) => {
+  const customSetRegion = (region: any) => {
     setUserOverridden(true);
     setRegion(region);
   };

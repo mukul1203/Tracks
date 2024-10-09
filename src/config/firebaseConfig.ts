@@ -3,6 +3,7 @@ import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 import { initializeApp } from "firebase/app";
 import "firebase/auth";
 import Constants from "expo-constants";
+// @ts-expect-error TS(2305): Module '"firebase/auth"' has no exported member 'g... Remove this comment to see the full error message
 import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 // import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use

@@ -15,10 +15,15 @@ const Stack = createStackNavigator();
 
 export default function AuthStack() {
   return (
+    // @ts-expect-error TS(2749): 'NavigationContainer' refers to a value, but is be... Remove this comment to see the full error message
     <NavigationContainer>
+      // @ts-expect-error TS(2503): Cannot find namespace 'Stack'.
       <Stack.Navigator>
+        // @ts-expect-error TS(2503): Cannot find namespace 'Stack'.
         <Stack.Screen name={WELCOME_SCREEN_NAME} component={WelcomeScreen} />
+        // @ts-expect-error TS(2503): Cannot find namespace 'Stack'.
         <Stack.Screen name={SIGNIN_SCREEN_NAME} component={SignInScreen} />
+        // @ts-expect-error TS(2503): Cannot find namespace 'Stack'.
         <Stack.Screen name={SIGNUP_SCREEN_NAME} component={SignUpScreen} />
       </Stack.Navigator>
     </NavigationContainer>

@@ -7,7 +7,7 @@ import {
 } from "../../services/location";
 import { updateUserLocation } from "../data/actions";
 
-export function useLocationEffect(setErrorMsg) {
+export function useLocationEffect(setErrorMsg: any) {
   useEffect(() => {
     const subscriptionPromise = (async () => {
       const { fgResponse, bgResponse, errorMsg } =
@@ -23,9 +23,10 @@ export function useLocationEffect(setErrorMsg) {
       });
     })();
     const unregisterLocationListener = registerLocationListener(
-      async (latitude, longitude, error) => {
+      async (latitude: any, longitude: any, error: any) => {
         console.log(`latitude:${latitude} longitude:${longitude}`);
         if (error?.message) {
+          // @ts-expect-error TS(2448): Block-scoped variable 'errorMsg' used before its d... Remove this comment to see the full error message
           setErrorMsg(errorMsg);
           return;
         }
@@ -35,6 +36,7 @@ export function useLocationEffect(setErrorMsg) {
     );
     return () => {
       unregisterLocationListener();
+      // @ts-expect-error TS(2722): Cannot invoke an object which is possibly 'undefin... Remove this comment to see the full error message
       subscriptionPromise.then((stopFn) => stopFn());
     };
   }, []);

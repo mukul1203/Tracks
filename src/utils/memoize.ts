@@ -1,9 +1,9 @@
-export const memoize = (fn) => {
+export const memoize = (fn: any) => {
   // Create a cache to store the results
   const cache = new Map();
 
   // Return a new function that wraps the original function
-  return async function (...args) {
+  return async function (...args: any[]) {
     // Generate a cache key based on the arguments
     const key = JSON.stringify(args);
 

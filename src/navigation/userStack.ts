@@ -15,9 +15,12 @@ import CreateGroupScreen from "../screens/CreateGroupScreen";
 const Stack = createStackNavigator();
 
 export default function UserStack() {
+  // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
   const [groupId] = useGroup(null);
   return (
+    // @ts-expect-error TS(2749): 'NavigationContainer' refers to a value, but is be... Remove this comment to see the full error message
     <NavigationContainer>
+      // @ts-expect-error TS(2503): Cannot find namespace 'Stack'.
       <Stack.Navigator>
         {groupId ? (
           <Stack.Screen
@@ -26,13 +29,18 @@ export default function UserStack() {
             initialParams={{ groupId }}
           />
         ) : (
+          // @ts-expect-error TS(2503): Cannot find namespace 'Stack'.
           <Stack.Group>
+            // @ts-expect-error TS(2503): Cannot find namespace 'Stack'.
             <Stack.Screen
               name={SIGNED_IN_SCREEN_NAME}
+              // @ts-expect-error TS(2304): Cannot find name 'component'.
               component={SignedInScreen}
             />
+            // @ts-expect-error TS(2503): Cannot find namespace 'Stack'.
             <Stack.Screen
               name={CREATE_GROUP_SCREEN_NAME}
+              // @ts-expect-error TS(2304): Cannot find name 'component'.
               component={CreateGroupScreen}
             />
           </Stack.Group>

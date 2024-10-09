@@ -13,15 +13,15 @@ import {
 } from "./paths";
 import { getUserIds } from "./selectors";
 
-export const makeObjFromlist = (list) => {
+export const makeObjFromlist = (list: any) => {
   console.log(list);
-  return list.reduce((acc, item) => {
+  return list.reduce((acc: any, item: any) => {
     acc[item] = true;
     return acc;
   }, {});
 };
 
-export const makeInvites = async (emails, toGroupId, from) => {
+export const makeInvites = async (emails: any, toGroupId: any, from: any) => {
   return (await getUserIds(emails)).map((userId) => {
     return {
       [INVITE_SENT_BY.substring(1)]: from,
@@ -30,7 +30,7 @@ export const makeInvites = async (emails, toGroupId, from) => {
     };
   });
 };
-export const makeGroup = async (id, emails, groupName, createdBy) => {
+export const makeGroup = async (id: any, emails: any, groupName: any, createdBy: any) => {
   return {
     [GROUP_NAME.substring(1)]: groupName,
     [GROUP_CREATED_BY.substring(1)]: createdBy,
@@ -38,7 +38,7 @@ export const makeGroup = async (id, emails, groupName, createdBy) => {
     [GROUP_ID.substring(1)]: id,
   };
 };
-export const makeUser = (name, email, userId) => {
+export const makeUser = (name: any, email: any, userId: any) => {
   return {
     [USER_EMAIL.substring(1)]: email,
     [USER_ID.substring(1)]: userId,

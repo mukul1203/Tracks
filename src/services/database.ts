@@ -15,22 +15,23 @@ import {
 } from "firebase/database";
 
 const firebaseDB = getDatabase();
-function getConstraint(string) {
+function getConstraint(string: any) {
   switch (string) {
     case "equals":
       return equalTo;
   }
-  return (val) =>
-    console.log("Unsupported operator is predicate for db node observer");
+  return (val: any) => console.log("Unsupported operator is predicate for db node observer");
 }
 
-function getConstrainedPathRef(path, predicate) {
+function getConstrainedPathRef(path: any, predicate: any) {
   let pathRef = ref(firebaseDB, path);
   if (predicate.length > 0) {
     const [attribute, operator, value] = predicate;
+    // @ts-expect-error TS(2739): Type 'Query' is missing the following properties f... Remove this comment to see the full error message
     pathRef = query(
       pathRef,
       orderByChild(attribute),
+      // @ts-expect-error TS(2345): Argument of type 'void | QueryConstraint' is not a... Remove this comment to see the full error message
       getConstraint(operator)(value)
     );
   }
@@ -39,27 +40,27 @@ function getConstrainedPathRef(path, predicate) {
 
 export const database = {
   //set a value to path
-  set: async function (path, value) {
+  set: async function (path: any, value: any) {
     return await set(ref(firebaseDB, path), value);
   },
   //get data at the given path, but consisting only of the children satisfying given predicate
-  get: async function (path, predicate = []) {
+  get: async function (path: any, predicate = []) {
     //assuming data is object
     return await get(getConstrainedPathRef(path, predicate)).then((data) =>
       data.exportVal()
     );
   },
   //update data at given path with given update object
-  update: async function (path, updateObj) {
+  update: async function (path: any, updateObj: any) {
     return await update(ref(firebaseDB, path), updateObj);
   },
   //create a unique child entry in the given path. Firebase will generate a unique key and this method returns that key.
-  push: function (path) {
+  push: function (path: any) {
     const { key } = push(ref(firebaseDB, path));
     return { key };
   },
   //listen for data changes at given path. Callback receives the data at the path in case of any changes.
-  onValue: function (path, callback, errorCallback) {
+  onValue: function (path: any, callback: any, errorCallback: any) {
     return onValue(
       ref(firebaseDB, path),
       (snapshot) => callback(snapshot.val()),
@@ -72,7 +73,7 @@ export const database = {
   //predicate is an array of [attribute, operator, value], telling that listen to children at
   //given path, ONLY those that fullfil the predicate i.e. whose given attribute (string) is 'operator' (e.g. "equals")
   //value.
-  onChildAdded: function (path, predicate, addedCallback, errorCallback) {
+  onChildAdded: function (path: any, predicate: any, addedCallback: any, errorCallback: any) {
     const pathRef = getConstrainedPathRef(path, predicate);
     const unsubscribeAdd = onChildAdded(
       pathRef,
@@ -84,7 +85,7 @@ export const database = {
     );
     return unsubscribeAdd;
   },
-  onChildRemoved: function (path, predicate, removedCallback, errorCallback) {
+  onChildRemoved: function (path: any, predicate: any, removedCallback: any, errorCallback: any) {
     const pathRef = getConstrainedPathRef(path, predicate);
     const unsubscribeRemove = onChildRemoved(
       pathRef,
@@ -95,7 +96,7 @@ export const database = {
     );
     return unsubscribeRemove;
   },
-  onChildChanged: function (path, predicate, changedCallback, errorCallback) {
+  onChildChanged: function (path: any, predicate: any, changedCallback: any, errorCallback: any) {
     const pathRef = getConstrainedPathRef(path, predicate);
     const unsubscribeChange = onChildChanged(
       pathRef,

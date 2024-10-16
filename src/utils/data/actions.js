@@ -32,9 +32,9 @@ export const userSignUp = async (name, email, password) => {
 };
 
 const createUser = async (name, email, userId) => {
-  console.log(`create user: ${name} ${email} ${userId}`);
+  // console.log(`create user: ${name} ${email} ${userId}`);
   const user = makeUser(name, email, userId);
-  console.log(user);
+  // console.log(user);
   await database.set(USERS + "/" + userId, user);
 };
 

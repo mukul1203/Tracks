@@ -1,8 +1,13 @@
-import React, { useCallback, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import { Icon } from "react-native-elements";
 import { useUsers } from "../utils/hooks/useUsers";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, {
+  AnimatedRegion,
+  Marker,
+  MarkerAnimated,
+  PROVIDER_GOOGLE,
+} from "react-native-maps";
 import { useMapRegion } from "../utils/hooks/useMapRegion";
 import { exitGroup } from "../utils/data/actions";
 import { getValueFromPath } from "../utils/data/selectors";
@@ -14,6 +19,7 @@ import {
   USER_NAME,
 } from "../utils/data/paths";
 
+const ANIMATION_DURATION = 1000; // 1 second, for both region and marker animations
 let color_cache = {};
 function generateUniqueColor(inputString) {
   if (!color_cache[inputString]) {
@@ -27,6 +33,65 @@ function generateUniqueColor(inputString) {
   }
   return color_cache[inputString];
 }
+const CustomMarker = ({ user }) => {
+  const markerRef = useRef(null);
+  const latitude = getValueFromPath(user, USER_LATITUDE);
+  const longitude = getValueFromPath(user, USER_LONGITUDE);
+  const coordinate = useRef(
+    new AnimatedRegion({
+      latitude,
+      longitude,
+    })
+  ).current;
+  const name = getValueFromPath(user, USER_NAME);
+  const email = getValueFromPath(user, USER_EMAIL);
+  const userId = getValueFromPath(user, USER_ID);
+  console.log(`=======> ${latitude}, ${longitude}`);
+  useEffect(() => {
+    const newCoordinate = { latitude, longitude };
+    if (Platform.OS === "android") {
+      markerRef?._component.animateMarkerToCoordinate(
+        newCoordinate,
+        ANIMATION_DURATION
+      );
+    } else {
+      // `useNativeDriver` defaults to false if not passed explicitly
+      // Would have preferred native animation instead of js, but setting it true
+      // throws some error I haven't yet figured out a fix for. So keeping it false for the
+      // time being.
+      coordinate
+        .timing({
+          ...newCoordinate,
+          useNativeDriver: false,
+          duration: ANIMATION_DURATION,
+        })
+        .start();
+    }
+  }, [latitude, longitude]);
+  return (
+    <Marker.Animated
+      ref={markerRef}
+      coordinate={coordinate}
+      title={`${name}(${email})`}
+      description={`${latitude}, ${longitude}`}
+      key={userId}
+      tracksViewChanges={false}
+    >
+      {/* <View
+        style={{
+          width: 16,
+          height: 16,
+          borderRadius: 8, // Half of the width and height to make it circular
+          backgroundColor: generateUniqueColor(userId),
+          justifyContent: "center",
+          alignItems: "center",
+          borderWidth: 3, // Add a border
+          borderColor: "black", // Border color
+        }}
+      ></View> */}
+    </Marker.Animated>
+  );
+};
 
 export default function MapScreen({
   route: {
@@ -37,46 +102,44 @@ export default function MapScreen({
   //MapScreen is for an existing group
   const [errorMsg, setErrorMsg] = useState(null);
   const [allUsers] = useUsers(groupId, setErrorMsg);
-  const [region, setRegion, autoFocus] = useMapRegion(allUsers, setErrorMsg);
+  const [region, setRegion, autoFocus, setAutoFocus] = useMapRegion(
+    allUsers,
+    setErrorMsg
+  );
+  // const animatedRegion = useRef(new AnimatedRegion(region)).current;
+  const mapviewRef = useRef(null);
+  useEffect(() => {
+    // animate only in auto mode, not when user has taken control by panning
+    // setTimeout(() => {
+    if (autoFocus)
+      mapviewRef.current?.animateToRegion(region, ANIMATION_DURATION);
+    // }, 0);
+    // if (autoFocus) {
+    //   animatedRegion
+    //     .timing({
+    //       region,
+    //       duration: ANIMATION_DURATION, // Smooth animation over 1 second
+    //       useNativeDriver: false,
+    //     })
+    //     .start();
+    // }
+  }, [region, autoFocus]);
+  // console.log(`region: ${JSON.stringify(region)}`);
   //This is wierd, but works.
   //We need to use a ChangeComplete callback, not Change callback
   //and with the isGesture check. Will reason about it later,
   //but for now let it be.
-  const onRegionChangeComplete = useCallback((inRegion, { isGesture }) => {
+  const onRegionChange = useCallback((inRegion, { isGesture }) => {
+    // console.log(`region: ${JSON.stringify(inRegion)}`);
     if (isGesture)
       //FIXME: this won't work for apple maps.
       setRegion(inRegion);
   });
 
   const getMarkers = () => {
-    return Object.values(allUsers).map((user) => {
-      const latitude = getValueFromPath(user, USER_LATITUDE);
-      const longitude = getValueFromPath(user, USER_LONGITUDE);
-      const name = getValueFromPath(user, USER_NAME);
-      const email = getValueFromPath(user, USER_EMAIL);
-      const userId = getValueFromPath(user, USER_ID);
-      return (
-        <Marker
-          coordinate={{ latitude, longitude }}
-          title={`${name}(${email})`}
-          description={`${latitude}, ${longitude}`}
-          key={userId}
-        >
-          <View
-            style={{
-              width: 16,
-              height: 16,
-              borderRadius: 8, // Half of the width and height to make it circular
-              backgroundColor: generateUniqueColor(userId),
-              justifyContent: "center",
-              alignItems: "center",
-              borderWidth: 3, // Add a border
-              borderColor: "black", // Border color
-            }}
-          ></View>
-        </Marker>
-      );
-    });
+    return Object.values(allUsers).map((user) => (
+      <CustomMarker user={user} key={getValueFromPath(user, USER_ID)} />
+    ));
   };
   return (
     <View style={styles.container}>
@@ -85,10 +148,19 @@ export default function MapScreen({
       ) : (
         <View style={styles.container}>
           <MapView
+            ref={mapviewRef}
             provider={PROVIDER_GOOGLE}
             style={styles.map}
-            region={region}
-            onRegionChangeComplete={onRegionChangeComplete}
+            // region={region}
+            // onRegionChangeComplete={onRegionChangeComplete}
+            onRegionChange={onRegionChange}
+            followsUserLocation={false}
+            onUserLocationChange={(event) => {
+              console.log(
+                `user location changed ${event.coordinate.latitude},${event.coordinate.longitude}`
+              );
+            }}
+            tracksViewChanges={false}
           >
             {getMarkers()}
           </MapView>
@@ -105,7 +177,7 @@ export default function MapScreen({
             type="material-community"
             size={20}
             containerStyle={styles.focusButton}
-            onPress={() => autoFocus()}
+            onPress={() => setAutoFocus()}
           />
         </View>
       )}

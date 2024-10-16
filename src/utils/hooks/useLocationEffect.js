@@ -24,7 +24,7 @@ export function useLocationEffect(setErrorMsg) {
     })();
     const unregisterLocationListener = registerLocationListener(
       async (latitude, longitude, error) => {
-        console.log(`latitude:${latitude} longitude:${longitude}`);
+        // console.log(`latitude:${latitude} longitude:${longitude}`);
         if (error?.message) {
           setErrorMsg(errorMsg);
           return;

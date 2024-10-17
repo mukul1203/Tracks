@@ -35,14 +35,15 @@ function generateUniqueColor(inputString) {
 }
 const CustomMarker = ({ user }) => {
   const markerRef = useRef(null);
-  const latitude = getValueFromPath(user, USER_LATITUDE);
-  const longitude = getValueFromPath(user, USER_LONGITUDE);
-  const coordinate = useRef(
-    new AnimatedRegion({
+  const latitude = getValueFromPath(user, USER_LATITUDE) || 0;
+  const longitude = getValueFromPath(user, USER_LONGITUDE) || 0;
+  const coordinateRef = useRef(null);
+  if (coordinateRef.current === null) {
+    coordinateRef.current = new AnimatedRegion({
       latitude,
       longitude,
-    })
-  ).current;
+    });
+  }
   const name = getValueFromPath(user, USER_NAME);
   const email = getValueFromPath(user, USER_EMAIL);
   const userId = getValueFromPath(user, USER_ID);
@@ -59,25 +60,40 @@ const CustomMarker = ({ user }) => {
       // Would have preferred native animation instead of js, but setting it true
       // throws some error I haven't yet figured out a fix for. So keeping it false for the
       // time being.
-      coordinate
+      console.log(`*************** animation STARTED`);
+      coordinateRef.current
         .timing({
           ...newCoordinate,
           useNativeDriver: false,
           duration: ANIMATION_DURATION,
         })
-        .start();
+        .start(({ finished }) => {
+          /* completion callback */
+          console.log(`**************** animation finished: ${finished}`);
+        });
     }
+    return () => {
+      coordinateRef.current.stopAnimation((stopped_at_region) => {
+        console.log(
+          `stopped animation at ${JSON.stringify(stopped_at_region)}`
+        );
+        coordinateRef.current.setValue({
+          ...stopped_at_region,
+          ...newCoordinate,
+        });
+      });
+    };
   }, [latitude, longitude]);
   return (
     <Marker.Animated
       ref={markerRef}
-      coordinate={coordinate}
+      coordinate={coordinateRef.current}
       title={`${name}(${email})`}
       description={`${latitude}, ${longitude}`}
       key={userId}
       tracksViewChanges={false}
     >
-      {/* <View
+      <View
         style={{
           width: 16,
           height: 16,
@@ -88,7 +104,7 @@ const CustomMarker = ({ user }) => {
           borderWidth: 3, // Add a border
           borderColor: "black", // Border color
         }}
-      ></View> */}
+      ></View>
     </Marker.Animated>
   );
 };
@@ -152,15 +168,14 @@ export default function MapScreen({
             provider={PROVIDER_GOOGLE}
             style={styles.map}
             // region={region}
-            // onRegionChangeComplete={onRegionChangeComplete}
-            onRegionChange={onRegionChange}
+            onRegionChangeComplete={onRegionChange}
+            // onRegionChange={onRegionChange}
             followsUserLocation={false}
             onUserLocationChange={(event) => {
               console.log(
                 `user location changed ${event.coordinate.latitude},${event.coordinate.longitude}`
               );
             }}
-            tracksViewChanges={false}
           >
             {getMarkers()}
           </MapView>

@@ -61,6 +61,7 @@ export function useMapRegion(users, setErrorMsg) {
   }, [JSON.stringify(locations), userOverridden]);
 
   const customSetRegion = (region) => {
+    console.log(`setRegion called with region ${JSON.stringify(region)}`);
     setUserOverridden(true);
     setRegion(region);
   };

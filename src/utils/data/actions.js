@@ -16,6 +16,12 @@ import { getInvitesToGroup, getUsersWithActiveGroup } from "./selectors";
 
 export const userSignIn = async (email, password) => {
   await auth.userSignIn(email, password);
+  //Make the user entry in db here
+  await createUser(
+    auth.currentUserName(),
+    auth.currentUserEmail(),
+    auth.currentUserId()
+  );
 };
 
 export const userSignOut = async () => {
@@ -26,9 +32,13 @@ export const userSignOut = async () => {
 
 export const userSignUp = async (name, email, password) => {
   // This will create a user account and also sign in the user on successful account creation
-  await auth.userSignUp(email, password);
+  await auth.userSignUp(name, email, password);
   //Make the user entry in db here
-  await createUser(name, auth.currentUserEmail(), auth.currentUserId());
+  await createUser(
+    auth.currentUserName(),
+    auth.currentUserEmail(),
+    auth.currentUserId()
+  );
 };
 
 const createUser = async (name, email, userId) => {

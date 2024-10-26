@@ -14,7 +14,7 @@ import {
 import { getUserIds } from "./selectors";
 
 export const makeObjFromlist = (list) => {
-  console.log(list);
+  // console.log(list);
   return list.reduce((acc, item) => {
     acc[item] = true;
     return acc;

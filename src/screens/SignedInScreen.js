@@ -10,8 +10,8 @@ import { userSignOut } from "../utils/data/actions";
 
 export default function SignedInScreen({ navigation }) {
   const { receivedInvites } = useInvites();
-  console.log("received invites");
-  console.log(receivedInvites);
+  // console.log("received invites");
+  // console.log(receivedInvites);
   return (
     <Background>
       <View style={styles.container}>

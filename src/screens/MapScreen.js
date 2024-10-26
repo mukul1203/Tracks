@@ -1,24 +1,21 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Icon } from "react-native-elements";
 import { useUsers } from "../utils/hooks/useUsers";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import { useMapRegion } from "../utils/hooks/useMapRegion";
+import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import { exitGroup } from "../utils/data/actions";
-
-let color_cache = {};
-function generateUniqueColor(inputString) {
-  if (!color_cache[inputString]) {
-    let hash = 0;
-    for (let i = 0; i < inputString.length; i++) {
-      hash = inputString.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    // Ensure the generated color has enough contrast with white background
-    const color = "#" + ((hash & 0xffffff) | 0xaaaaaa).toString(16);
-    color_cache[inputString] = color;
-  }
-  return color_cache[inputString];
-}
+import { getValueFromPath } from "../utils/data/selectors";
+import { USER_ID } from "../utils/data/paths";
+import { useLocationEffect } from "../utils/hooks/useLocationEffect";
+import { CustomMarker } from "../components/MapCustomMarker";
+import {
+  H_PADDING,
+  LATITUDE,
+  LATITUDE_DELTA,
+  LONGITUDE,
+  LONGITUDE_DELTA,
+  V_PADDING,
+} from "./screenConstants";
 
 export default function MapScreen({
   route: {
@@ -29,47 +26,26 @@ export default function MapScreen({
   //MapScreen is for an existing group
   const [errorMsg, setErrorMsg] = useState(null);
   const [allUsers] = useUsers(groupId, setErrorMsg);
-  const [region, setRegion, autoFocus] = useMapRegion(allUsers, setErrorMsg);
-  //This is wierd, but works.
-  //We need to use a ChangeComplete callback, not Change callback
-  //and with the isGesture check. Will reason about it later,
-  //but for now let it be.
-  const onRegionChangeComplete = useCallback((inRegion, { isGesture }) => {
-    if (isGesture)
-      //FIXME: this won't work for apple maps.
-      setRegion(inRegion);
+  const [autofocus, setAutoFocus] = useState(true);
+  const mapviewRef = useRef(null);
+  const [] = useLocationEffect(setErrorMsg);
+  useEffect(() => {
+    if (autofocus)
+      mapviewRef.current?.fitToSuppliedMarkers(Object.keys(allUsers), {
+        animated: true,
+        edgePadding: {
+          top: V_PADDING,
+          left: H_PADDING,
+          bottom: V_PADDING,
+          right: H_PADDING,
+        },
+      });
+  }, [allUsers]);
+  const onRegionChange = useCallback((inRegion, { isGesture }) => {
+    // console.log(`region: ${JSON.stringify(inRegion)}`);
+    if (isGesture) setAutoFocus(false);
   });
 
-  const getMarkers = () => {
-    let markers = [];
-    for (let userId in allUsers) {
-      if (allUsers.hasOwnProperty(userId)) {
-        const { latitude = 0, longitude = 0, email } = allUsers[userId];
-        markers.push(
-          <Marker
-            coordinate={{ latitude, longitude }}
-            title={email}
-            description={JSON.stringify({ latitude, longitude })}
-            key={userId}
-          >
-            <View
-              style={{
-                width: 16,
-                height: 16,
-                borderRadius: 8, // Half of the width and height to make it circular
-                backgroundColor: generateUniqueColor(userId),
-                justifyContent: "center",
-                alignItems: "center",
-                borderWidth: 3, // Add a border
-                borderColor: "black", // Border color
-              }}
-            ></View>
-          </Marker>
-        );
-      }
-    }
-    return markers;
-  };
   return (
     <View style={styles.container}>
       {errorMsg ? (
@@ -77,12 +53,20 @@ export default function MapScreen({
       ) : (
         <View style={styles.container}>
           <MapView
+            ref={mapviewRef}
+            initialRegion={{
+              latitude: LATITUDE,
+              longitude: LONGITUDE,
+              latitudeDelta: LATITUDE_DELTA,
+              longitudeDelta: LONGITUDE_DELTA,
+            }}
             provider={PROVIDER_GOOGLE}
             style={styles.map}
-            region={region}
-            onRegionChangeComplete={onRegionChangeComplete}
+            onRegionChange={onRegionChange}
           >
-            {getMarkers()}
+            {Object.values(allUsers).map((user) => (
+              <CustomMarker data={user} key={getValueFromPath(user, USER_ID)} />
+            ))}
           </MapView>
           <Text style={styles.counter}>{Object.keys(allUsers).length}</Text>
           <Icon
@@ -97,7 +81,7 @@ export default function MapScreen({
             type="material-community"
             size={20}
             containerStyle={styles.focusButton}
-            onPress={() => autoFocus()}
+            onPress={() => setAutoFocus(true)}
           />
         </View>
       )}

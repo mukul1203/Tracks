@@ -27,7 +27,7 @@ TaskManager.defineTask(
     const {
       coords: { latitude, longitude },
     } = locations[0];
-    console.log(`latitude: ${latitude}, longitude:${longitude}`);
+    // console.log(`latitude: ${latitude}, longitude:${longitude}`);
     locationListeners.forEach((fn) => fn(latitude, longitude, error));
   }
 );

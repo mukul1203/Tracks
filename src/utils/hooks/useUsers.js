@@ -5,7 +5,7 @@ import { USER_ACTIVE_GROUP, USERS } from "../data/paths";
 // returns an OBJECT (not array) of users in the group
 export function useUsers(groupId, setErrorMsg) {
   const [allUsers, setAllUsers] = useState({});
-
+  // console.log(JSON.stringify(allUsers));
   useEffect(() => {
     const unsubscribeAdd = database.onChildAdded(
       USERS,
@@ -41,6 +41,9 @@ export function useUsers(groupId, setErrorMsg) {
       (error) => setErrorMsg(error.message)
     );
     return () => {
+      // clear all users of existing group on effect resynchronization
+      setAllUsers({});
+      // unsubscribe all
       unsubscribeAdd();
       unsubscribeChange();
       unsubscribeRemove();

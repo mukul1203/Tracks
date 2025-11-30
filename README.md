@@ -2,112 +2,54 @@
 
 A side project app to track multiple people on a map.
 
-## Development Setup
+## 1. Environment Setup (Prerequisites)
 
-Follow these steps to set up the project locally.
-
-### 1. Environment Configuration
+### Step 1: Environment Configuration
 
 Create a copy of `TODO.env` as `.env.local`. Fill in all the details.
 
-### 2. Install Dependencies
+### Step 2: Install Dependencies
 
 From the project `src` folder, run:
 
 ```bash
-npm install
+npx expo install
 ```
 
-### 3. Install EAS CLI
-
-Run the following command to globally install EAS (Expo Application Services) CLI:
-
-```bash
-npm install -g eas-cli
-```
-
-### 4. Push Secrets to EAS
-
-_(Only if you created a fresh EAS account, or if `.env.local` has new environment variables)_
-
-Run the following to push the env variables as secrets on the EAS server. This avoids pushing variables to git or exposing them insecurely.
-
-```bash
-eas secret:push --force
-```
-
-### 5. Build Development Client
-
-Run the following command:
-
-```bash
-eas build --profile development
-```
-
-- This will prompt you to login with your EAS account credentials.
-- Select the platform for which to build: All, Android, or iOS.
-
-### 6. Install the Build
-
-Let the build finish on the EAS server. Once done, go to the EAS builds on your mobile device and install the build.
-
-### 7. Start Development Server
-
-Run a server to serve the JS bundle from your computer:
-
-```bash
-npx expo start --tunnel --dev-client
-```
-
-### 8. Launch and Login
-
-Launch the installed app on mobile and make sure to log in with your EAS account.
-
-### 9. Connect to Development Server
-
-You should see your EAS project (Tracks) development server listed. Click it to load the bundle.
-
-### 10. Verification
-
-The app should be up and running!
-
-### 11. Additional Dependencies
-
-If required, install map support:
-
-```bash
-npx expo install react-native-maps
-```
+Note that using expo install ensures that the dependency versions are compatible with the expo version (specified in package.json). E.g. react-native-maps module version compatible to expo version must be installed, else app breaks. expo install updates the versions in package.json if needed and then does npm install.
 
 ---
 
-## Notes
+## 2. Quick Start: Local Development (Expo Go)
 
-### Codespaces & Tunneling
+Use this method for standard development if you are **not** using custom native code (most common).
 
-`--tunnel` is important while working on GitHub Codespaces because the virtual machine has a different network configuration than your mobile device. The tunnel allows them to connect.
+### Run on iOS Simulator
 
-### Expo Go vs. Development Build
+1. Start the development server:
+   ```bash
+   npx expo start
+   ```
+2. Press `shift + i` to choose a simulator. Choose iphone to open the app in the iphone simulator. (ipads seem to have issues, not sure yet)
+   - _Note: If you don't have the simulator installed, you need Xcode installed on your Mac._
 
-You can either use the **Expo Go** app to run your JavaScript code or build your own **Development Build**.
+### Run on Android Emulator
 
-- **Expo Go**: Good for quick testing if you don't have custom native code.
-- **Development Build**: Required if you have native code changes (iOS/Android specific). EAS builds and deploys the APK/IPA for you.
-  - When invoking `eas` with `--development`, it produces a custom version of Expo Go. The JS code runs from your development server.
-  - In production mode, the JS code is baked into the app.
+1. Start the development server:
+   ```bash
+   npx expo start
+   ```
+2. Press `a` to open the app in the Android Emulator.
 
-### iOS Simulator
+---
 
-- **No Native Changes**: Switch to Expo Go mode. Press `s` after running `npx expo start`, then press `i` for iOS simulator.
-- **Custom Native Code**: You must download the development build on the simulator, then click your dev server to run it.
-
-## Debugging
+## 3. Debugging
 
 1. Install the **Expo Tools** extension in VS Code.
-2. Run `npx expo start`.
-3. Press `s` to switch to Expo Go.
-4. Press `i` for iOS simulator.
-5. Launch the "Debug Expo app" task from the extension.
+2. Run `npx expo start` in the terminal.
+3. Press `s` to switch to Expo Go (if not already).
+4. Press `i` (iOS) or `a` (Android) to launch the app.
+5. In VS Code, launch the **"Debug Expo app"** task from the extension.
 
 ### Advanced Debugging (Legacy/Reference)
 
@@ -130,3 +72,73 @@ If you get an error about a failed npm command, VS Code might be reading paths f
 - For Zsh: Check `.zshrc` / `.zshenv`.
 - Restart VS Code after applying fixes.
 </details>
+
+---
+
+## 4. Advanced: Custom Development Build (EAS)
+
+Use this method **only** if you have added native modules that require custom native code (not supported by Expo Go).
+
+### Step 1: Install EAS CLI
+
+Globally install EAS (Expo Application Services) CLI:
+
+```bash
+npm install -g eas-cli
+```
+
+### Step 2: Push Secrets to EAS
+
+_(Only if you created a fresh EAS account, or if `.env.local` has new environment variables)_
+
+Push env variables as secrets to EAS (avoids exposing them in git):
+
+```bash
+eas secret:push --force
+```
+
+### Step 3: Build Development Client
+
+Run the command below and log in with your EAS credentials when prompted:
+
+```bash
+eas build --profile development
+```
+
+- Select the platform: All, Android, or iOS.
+
+### Step 4: Install the Build
+
+Once the build finishes on the EAS server:
+
+- **Physical Device**: Go to the build link on your mobile and install.
+- **Simulator**: Download the build file and drag it onto the simulator.
+
+### Step 5: Start Development Server
+
+Run the server for the development client:
+
+```bash
+npx expo start --tunnel --dev-client
+```
+
+### Step 6: Launch and Connect
+
+1. Launch the installed "Tracks" app on your device/simulator.
+2. Log in with your EAS account if prompted.
+3. You should see your development server listed. Click it to load the bundle.
+
+---
+
+## Notes
+
+### Codespaces & Tunneling
+
+`--tunnel` is important while working on GitHub Codespaces because the virtual machine has a different network configuration than your mobile device. The tunnel allows them to connect.
+
+### Expo Go vs. Development Build
+
+- **Expo Go**: Good for quick testing if you don't have custom native code.
+- **Development Build**: Required if you have native code changes (iOS/Android specific). EAS builds and deploys the APK/IPA for you.
+  - When invoking `eas` with `--development`, it produces a custom version of Expo Go. The JS code runs from your development server.
+  - In production mode, the JS code is baked into the app.

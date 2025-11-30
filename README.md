@@ -1,44 +1,132 @@
 # Tracks
 
-A side project: possibly an app to track multiple people on map
+A side project app to track multiple people on a map.
 
-Open in github codespaces...
+## Development Setup
 
-1. Create a copy of TODO.env as .env.local. Fill in all the details.
-2. From the project src folder, run npm install.
-3. Run npm install -g eas-cli to globally install eas (expo application services) cli
-4. (Only if created a fresh eas account, or if .env.local has more env variables introduced)
-   Run eas secret:push --force to push the env variables as secrets on eas server. This is to avoid
-   pushing the variables to git or on server in some other way as they could be then compromised.
-5. eas build --profile development
-   This will prompt you to login with your eas account credentials. Do so.
-   Then select the platform for which to build: All/Android/iOS
-6. Let the build finish on eas server. Once done, go to the eas builds on mobile and install the build.
-7. Run a server to serve the js bundle from your computer:
-   npx expo start --tunnel --dev-client
-8. Launch the installed app on mobile and make sure to Log in with your eas account
-9. You should see your eas project (Tracks) development server there. Click and it will load the bundle.
-10. And the app should be up and running!
-11. npx expo install react-native-maps
+Follow these steps to set up the project locally.
 
-# Note
+### 1. Environment Configuration
 
---tunnel is important while working on codespaces, because the virtual machine on which you are building has different network than your mobile. Tunnel allows connecting...
+Create a copy of `TODO.env` as `.env.local`. Fill in all the details.
 
-You can either have Expo Go app as the native app inside which to run your javascript code, or you could choose to build your own version of Expo Go (because probably you have some native code changes per platform i.e. ios or android specific). To build your own version, EAS service provides you the way. It builds and deploys the apk or ipa for you to download on your device. When eas is invoked with --development, that means you are saying just produce my version of expo go, but the js code to run inside it will come from a development server, hence you need to run the dev server on your machine and click that in your downloaded app. In production mode, the js code will be baked into the app.
+### 2. Install Dependencies
 
-To run on ios simulator, if you don't have any native code changes, best is to switch to expo go mode (press s after you do npx expo start, then press i for ios simulator). This is because then, expo go will be installed on your ios simulator and your js code will be downloaded and run there. But if you are in development build with your custom eas build, you would need to download that build on simulator and then click your dev server in it and run (as usual on a physical device).
+From the project `src` folder, run:
 
-To debug:
-Install the expo tools extension, it will provide a "Debug Expo app" task. Use that to attach after running npx expo start > press s to switch to expo go > press i for ios simulator > launch Debug expo app task.
-npx expo start
+```bash
+npm install
+```
 
-( IGNORE THIS:
-Open launch.json file > Click Add configuration button > from dropdown, select React Native (you will have to have the React native tools extension downloaded) > Select Debug Application > Exponent > Hermes.
-Just click run button from the launch tasks dropdown now. You get an error about failed npm command.
-Issue is your vscode is trying to run npm, but it reads the program paths from equivalent of bash_profile, rather than from bashrc (which will be used when you run vscode from terminal, not UI).
-To bring nvm etc. paths into your bash_profile, follow the link:
-https://github.com/microsoft/vscode-react-native/issues/1753#issuecomment-1050694929
-If you have zsh instead of bash, .bashrc => .zshrc, .bash_profile => .zshenv (and if not working, also .zprofile).
-Make sure to restart vscode after the steps in url above are done.
-)
+### 3. Install EAS CLI
+
+Run the following command to globally install EAS (Expo Application Services) CLI:
+
+```bash
+npm install -g eas-cli
+```
+
+### 4. Push Secrets to EAS
+
+_(Only if you created a fresh EAS account, or if `.env.local` has new environment variables)_
+
+Run the following to push the env variables as secrets on the EAS server. This avoids pushing variables to git or exposing them insecurely.
+
+```bash
+eas secret:push --force
+```
+
+### 5. Build Development Client
+
+Run the following command:
+
+```bash
+eas build --profile development
+```
+
+- This will prompt you to login with your EAS account credentials.
+- Select the platform for which to build: All, Android, or iOS.
+
+### 6. Install the Build
+
+Let the build finish on the EAS server. Once done, go to the EAS builds on your mobile device and install the build.
+
+### 7. Start Development Server
+
+Run a server to serve the JS bundle from your computer:
+
+```bash
+npx expo start --tunnel --dev-client
+```
+
+### 8. Launch and Login
+
+Launch the installed app on mobile and make sure to log in with your EAS account.
+
+### 9. Connect to Development Server
+
+You should see your EAS project (Tracks) development server listed. Click it to load the bundle.
+
+### 10. Verification
+
+The app should be up and running!
+
+### 11. Additional Dependencies
+
+If required, install map support:
+
+```bash
+npx expo install react-native-maps
+```
+
+---
+
+## Notes
+
+### Codespaces & Tunneling
+
+`--tunnel` is important while working on GitHub Codespaces because the virtual machine has a different network configuration than your mobile device. The tunnel allows them to connect.
+
+### Expo Go vs. Development Build
+
+You can either use the **Expo Go** app to run your JavaScript code or build your own **Development Build**.
+
+- **Expo Go**: Good for quick testing if you don't have custom native code.
+- **Development Build**: Required if you have native code changes (iOS/Android specific). EAS builds and deploys the APK/IPA for you.
+  - When invoking `eas` with `--development`, it produces a custom version of Expo Go. The JS code runs from your development server.
+  - In production mode, the JS code is baked into the app.
+
+### iOS Simulator
+
+- **No Native Changes**: Switch to Expo Go mode. Press `s` after running `npx expo start`, then press `i` for iOS simulator.
+- **Custom Native Code**: You must download the development build on the simulator, then click your dev server to run it.
+
+## Debugging
+
+1. Install the **Expo Tools** extension in VS Code.
+2. Run `npx expo start`.
+3. Press `s` to switch to Expo Go.
+4. Press `i` for iOS simulator.
+5. Launch the "Debug Expo app" task from the extension.
+
+### Advanced Debugging (Legacy/Reference)
+
+<details>
+<summary>Click to expand launch.json configuration notes</summary>
+
+(IGNORE THIS SECTION UNLESS NECESSARY)
+
+To set up `launch.json`:
+
+1. Open `launch.json`.
+2. Click "Add configuration".
+3. Select "React Native" (requires React Native Tools extension).
+4. Select "Debug Application" > "Exponent" > "Hermes".
+
+**Troubleshooting NPM Paths:**
+If you get an error about a failed npm command, VS Code might be reading paths from `.bash_profile` instead of `.bashrc`.
+
+- To bring nvm paths into `.bash_profile`, see: [Issue #1753 Comment](https://github.com/microsoft/vscode-react-native/issues/1753#issuecomment-1050694929)
+- For Zsh: Check `.zshrc` / `.zshenv`.
+- Restart VS Code after applying fixes.
+</details>

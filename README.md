@@ -10,7 +10,9 @@ Second screenshot shows the map view with live location of the three friends as 
 
 Please watch this video for a demo:
 
-[![Demo Video](https://img.youtube.com/vi/gaMtLlqV9Eo/0.jpg)](https://youtu.be/gaMtLlqV9Eo)
+[![Tracks App Demo](https://github.com/user-attachments/assets/f17fc428-e7a8-4293-919b-b013ae1cb4b4)](https://youtu.be/gaMtLlqV9Eo)
+
+🔗 **Full Demo Video (1:40):** https://youtu.be/gaMtLlqV9Eo
 
 ## 1. Environment Setup (Prerequisites)
 

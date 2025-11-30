@@ -2,8 +2,15 @@
 
 An app to track multiple people on a map.
 
+First screenshot below shows the ability to create a group or join the ones already created or invited to (e.g. here Friends on trip is the group created by the user).
+Second screenshot shows the map view with live location of the three friends as three colored circles.
+
 <img src="https://github.com/user-attachments/assets/ef55adf8-f5f5-4753-9bd6-15b3f143f85c" alt="shot1" width="25%" style="display:inline-block;"/>
 <img src="https://github.com/user-attachments/assets/d9d684c1-e955-4313-8fc4-9e1ec421ef74" alt="shot2" width="25%" style="display:inline-block; margin-left: 1em;"/>
+
+Please watch this video for a demo:
+
+[![Demo Video](https://img.youtube.com/vi/gaMtLlqV9Eo/0.jpg)](https://youtu.be/gaMtLlqV9Eo)
 
 ## 1. Environment Setup (Prerequisites)
 

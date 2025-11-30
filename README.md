@@ -1,6 +1,9 @@
 # Tracks
 
-A side project app to track multiple people on a map.
+An app to track multiple people on a map.
+
+<img src="https://github.com/user-attachments/assets/ef55adf8-f5f5-4753-9bd6-15b3f143f85c" alt="shot1" width="25%" style="display:inline-block;"/>
+<img src="https://github.com/user-attachments/assets/d9d684c1-e955-4313-8fc4-9e1ec421ef74" alt="shot2" width="25%" style="display:inline-block; margin-left: 1em;"/>
 
 ## 1. Environment Setup (Prerequisites)
 

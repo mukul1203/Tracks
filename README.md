@@ -1,6 +1,6 @@
 # Tracks
 
-An app to track multiple people on a map.
+An app to track live location of multiple people on a map. Built with React native, expo, google maps API and firebase.
 
 First screenshot below shows the ability to create a group or join the ones already created or invited to (e.g. here Friends on trip is the group created by the user).
 Second screenshot shows the map view with live location of the three friends as three colored circles.

@@ -32,7 +32,7 @@ export default function MapScreen({
   useEffect(() => {
     if (autofocus)
       mapviewRef.current?.fitToSuppliedMarkers(Object.keys(allUsers), {
-        animated: true,
+        animated: false,
         edgePadding: {
           top: V_PADDING,
           left: H_PADDING,

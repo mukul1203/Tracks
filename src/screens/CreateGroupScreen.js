@@ -1,114 +1,151 @@
 import { useState } from "react";
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Button, Input } from "react-native-elements";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { Background } from "../components/Background";
 import { auth } from "../services/auth";
 import { createGroup } from "../utils/data/actions";
+import { colors, radius, spacing } from "../theme";
 import { SIGNED_IN_SCREEN_NAME } from "./screenConstants";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const CreateGroupScreen = function ({ navigation }) {
-  const [list, setList] = useState([auth.currentUserEmail()]); //list of emails state
-  const [entry, setEntry] = useState(""); //input box state
+  const me = auth.currentUserEmail();
+  const [list, setList] = useState([me]); // emails to invite (includes self)
+  const [entry, setEntry] = useState(""); // email input box
   const [entryError, setEntryError] = useState("");
   const [groupName, setGroupName] = useState("");
+  const [nameTouched, setNameTouched] = useState(false);
   const [creating, setCreating] = useState(false);
-  const keyExtractor = (item, index) => index.toString();
-  const InviteListItem = (email) => (
-    <View style={styles.listItem}>
-      <Text style={styles.text}>{email}</Text>
-      {email != auth.currentUserEmail() && (
-        <Button
-          title="Delete"
-          type="outline"
-          buttonStyle={styles.button}
-          onPress={() =>
-            setList((list) => list.filter((item) => item != email))
-          }
-        />
-      )}
-    </View>
-  );
+
+  const addEmail = () => {
+    const normalized = entry.trim().toLowerCase();
+    if (!normalized) {
+      setEntryError("Enter an email address");
+      return;
+    }
+    if (!EMAIL_REGEX.test(normalized)) {
+      setEntryError("Enter a valid email address");
+      return;
+    }
+    if (list.includes(normalized)) {
+      setEntryError("This email is already added");
+      return;
+    }
+    setList([...list, normalized]);
+    setEntry("");
+    setEntryError("");
+  };
+
+  const done = async () => {
+    setNameTouched(true);
+    if (!groupName.trim()) return;
+    setCreating(true);
+    try {
+      await createGroup(list, groupName.trim());
+      navigation.navigate(SIGNED_IN_SCREEN_NAME);
+    } catch (error) {
+      Alert.alert("Couldn't create group", error.message);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const renderChip = (email) => {
+    const isMe = email === me;
+    return (
+      <View style={styles.chip}>
+        <Text style={styles.chipText}>{isMe ? `${email} (you)` : email}</Text>
+        {!isMe && (
+          <TouchableOpacity
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            onPress={() =>
+              setList((l) => l.filter((item) => item !== email))
+            }
+          >
+            <Icon name="close-circle" size={18} color={colors.textMuted} />
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  };
+
   return (
     <Background>
       <View style={styles.container}>
-        <Text style={{ ...styles.text, fontSize: 18 }}>
-          Invite participants
-        </Text>
+        <Text style={styles.title}>New group</Text>
+
         <Input
           placeholder="Group name"
+          placeholderTextColor={colors.textMuted}
           value={groupName}
-          onChangeText={setGroupName}
-          style={styles.text}
-          errorMessage={!groupName && "Group name is mandatory"}
-        ></Input>
-        <Input
-          placeholder="Email of participant"
-          value={entry}
-          onChangeText={(text) => {
-            setEntry(text);
-            if (entryError) setEntryError("");
+          onChangeText={(t) => {
+            setGroupName(t);
+            if (!nameTouched) setNameTouched(true);
           }}
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="email-address"
-          errorMessage={entryError}
           style={styles.text}
-        ></Input>
-        <Button
-          title="Add"
-          buttonStyle={styles.button}
-          onPress={() => {
-            const normalizedEntry = entry.trim().toLowerCase();
-            if (!normalizedEntry) {
-              setEntryError("Enter an email address");
-              return;
-            }
-            if (!EMAIL_REGEX.test(normalizedEntry)) {
-              setEntryError("Enter a valid email address");
-              return;
-            }
-            if (list.includes(normalizedEntry)) {
-              setEntryError("This email is already added");
-              return;
-            }
-            setList([...list, normalizedEntry]);
-            setEntry("");
-            setEntryError("");
-          }}
-        ></Button>
+          errorMessage={
+            nameTouched && !groupName.trim() ? "Group name is required" : ""
+          }
+        />
+
+        <Text style={styles.sectionLabel}>Invite by email</Text>
+        <View style={styles.addRow}>
+          <Input
+            containerStyle={styles.addInput}
+            placeholder="name@example.com"
+            placeholderTextColor={colors.textMuted}
+            value={entry}
+            onChangeText={(text) => {
+              setEntry(text);
+              if (entryError) setEntryError("");
+            }}
+            autoCapitalize="none"
+            autoCorrect={false}
+            spellCheck={false}
+            keyboardType="email-address"
+            textContentType="emailAddress"
+            returnKeyType="done"
+            onSubmitEditing={addEmail}
+            errorMessage={entryError}
+            style={styles.text}
+          />
+          <Button
+            icon={<Icon name="plus" size={22} color={colors.text} />}
+            buttonStyle={styles.addButton}
+            containerStyle={styles.addButtonContainer}
+            onPress={addEmail}
+          />
+        </View>
+
         <FlatList
-          keyExtractor={keyExtractor}
+          style={styles.list}
+          keyExtractor={(item, index) => index.toString()}
           data={list}
-          renderItem={({ item }) => InviteListItem(item)}
-        ></FlatList>
+          renderItem={({ item }) => renderChip(item)}
+        />
+
         <Text style={styles.hint}>
-          People not yet on the app will see the invite when they sign up with
+          People not on Tracks yet will see the invite when they sign up with
           the invited email.
         </Text>
+
         <Button
-          title="Done"
-          buttonStyle={styles.button}
+          title="Create group"
+          buttonStyle={styles.doneButton}
+          titleStyle={styles.doneTitle}
           disabled={creating}
-          icon={
-            creating ? <ActivityIndicator color="white" size="small" /> : undefined
-          }
-          onPress={async () => {
-            if (!groupName.trim()) {
-              return;
-            }
-            setCreating(true);
-            try {
-              await createGroup(list, groupName.trim());
-              navigation.navigate(SIGNED_IN_SCREEN_NAME);
-            } catch (error) {
-              Alert.alert("Couldn't create group", error.message);
-            } finally {
-              setCreating(false);
-            }
-          }}
-        ></Button>
+          loading={creating}
+          onPress={done}
+        />
       </View>
     </Background>
   );
@@ -117,32 +154,70 @@ const CreateGroupScreen = function ({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "stretch",
-    justifyContent: "center",
   },
-  button: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginLeft: 10,
-    borderRadius: 5,
+  title: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: colors.text,
+    marginBottom: spacing.md,
   },
-  text: { color: "white" },
-  hint: {
-    color: "white",
-    opacity: 0.8,
-    fontSize: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    fontStyle: "italic",
+  sectionLabel: {
+    color: colors.textMuted,
+    fontSize: 13,
+    fontWeight: "600",
+    marginTop: spacing.sm,
+    marginLeft: spacing.xs,
   },
-  listItem: {
+  addRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+  addInput: {
+    flex: 1,
+  },
+  addButtonContainer: {
+    marginTop: spacing.xs,
+  },
+  addButton: {
+    backgroundColor: colors.primary,
+    borderRadius: radius.md,
+    width: 48,
+    height: 48,
+  },
+  list: {
+    flexGrow: 0,
+    maxHeight: "40%",
+  },
+  chip: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "lightgray",
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  chipText: {
+    color: colors.text,
+    flexShrink: 1,
+  },
+  text: { color: colors.text },
+  hint: {
+    color: colors.textMuted,
+    fontSize: 12,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.sm,
+    fontStyle: "italic",
+  },
+  doneButton: {
+    backgroundColor: colors.primary,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
+    marginTop: spacing.sm,
+  },
+  doneTitle: {
+    fontWeight: "700",
   },
 });
 

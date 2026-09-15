@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 import { Icon } from "react-native-elements";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useUsers } from "../utils/hooks/useUsers";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import { exitGroup } from "../utils/data/actions";
@@ -8,6 +9,7 @@ import { getValueFromPath } from "../utils/data/selectors";
 import { USER_ID, USER_LATITUDE, USER_LONGITUDE } from "../utils/data/paths";
 import { useLocationEffect } from "../utils/hooks/useLocationEffect";
 import { CustomMarker } from "../components/MapCustomMarker";
+import { colors, radius, spacing } from "../theme";
 import {
   H_PADDING,
   LATITUDE,
@@ -24,6 +26,7 @@ export default function MapScreen({
   navigation,
 }) {
   //MapScreen is for an existing group
+  const insets = useSafeAreaInsets();
   const [errorMsg, setErrorMsg] = useState(null);
   const [allUsers] = useUsers(groupId, setErrorMsg);
   const [autofocus, setAutoFocus] = useState(true);
@@ -78,10 +81,25 @@ export default function MapScreen({
     if (isGesture) setAutoFocus(false);
   }, []);
 
+  const confirmExit = () =>
+    Alert.alert("Leave group?", "You'll stop sharing your location here.", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Leave",
+        style: "destructive",
+        onPress: () => exitGroup(groupId),
+      },
+    ]);
+
+  const count = locatedUsers.length;
+
   return (
     <View style={styles.container}>
       {errorMsg ? (
-        <Text>{errorMsg}</Text>
+        <View style={styles.errorBox}>
+          <Icon name="error-outline" type="material" size={40} color={colors.danger} />
+          <Text style={styles.errorText}>{errorMsg}</Text>
+        </View>
       ) : (
         <View style={styles.container}>
           <MapView
@@ -100,30 +118,46 @@ export default function MapScreen({
               <CustomMarker data={user} key={getValueFromPath(user, USER_ID)} />
             ))}
           </MapView>
-          {locatedUsers.length === 0 && (
+
+          {count === 0 && (
             <View style={styles.waiting} pointerEvents="none">
-              <ActivityIndicator size="large" />
+              <ActivityIndicator size="large" color={colors.primary} />
               <Text style={styles.waitingText}>Waiting for locations…</Text>
             </View>
           )}
-          <Text style={styles.counter}>{locatedUsers.length}</Text>
-          <Icon
-            name="close"
-            type="material"
-            size={20}
-            containerStyle={styles.closeButton}
-            onPress={() => exitGroup(groupId)}
-          />
-          <Icon
-            name="crosshairs-gps"
-            type="material-community"
-            size={20}
-            containerStyle={styles.focusButton}
-            onPress={() => {
-              setAutoFocus(true);
-              fitToUsers();
-            }}
-          />
+
+          {/* Live count pill */}
+          <View style={[styles.pill, { top: insets.top + spacing.sm }]}>
+            <Icon name="people" type="material" size={16} color={colors.text} />
+            <Text style={styles.pillText}>
+              {count === 0
+                ? "No one visible"
+                : `${count} ${count === 1 ? "person" : "people"}`}
+            </Text>
+          </View>
+
+          {/* Controls */}
+          <View style={[styles.controls, { top: insets.top + spacing.sm }]}>
+            <Icon
+              name="crosshairs-gps"
+              type="material-community"
+              size={22}
+              color={colors.textOnLight}
+              containerStyle={styles.controlButton}
+              onPress={() => {
+                setAutoFocus(true);
+                fitToUsers();
+              }}
+            />
+            <Icon
+              name="logout"
+              type="material-community"
+              size={22}
+              color={colors.danger}
+              containerStyle={styles.controlButton}
+              onPress={confirmExit}
+            />
+          </View>
         </View>
       )}
     </View>
@@ -137,11 +171,39 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
-  counter: {
+  pill: {
     position: "absolute",
-    top: "1%",
-    left: "1%",
-    backgroundColor: "yellow",
+    left: spacing.md,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.surfaceSolid,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.pill,
+  },
+  pillText: {
+    color: colors.text,
+    fontWeight: "600",
+    marginLeft: spacing.xs,
+  },
+  controls: {
+    position: "absolute",
+    right: spacing.md,
+    alignItems: "center",
+  },
+  controlButton: {
+    backgroundColor: colors.text,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.sm,
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
   },
   waiting: {
     ...StyleSheet.absoluteFillObject,
@@ -149,18 +211,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   waitingText: {
-    marginTop: 8,
+    marginTop: spacing.sm,
     fontSize: 16,
-    color: "#333",
+    color: colors.textOnLight,
+    fontWeight: "600",
   },
-  closeButton: {
-    position: "absolute",
-    top: "1%",
-    right: "3%",
+  errorBox: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: spacing.lg,
   },
-  focusButton: {
-    position: "absolute",
-    top: "7%",
-    right: "3%",
+  errorText: {
+    marginTop: spacing.sm,
+    fontSize: 15,
+    color: colors.textOnLight,
+    textAlign: "center",
   },
 });

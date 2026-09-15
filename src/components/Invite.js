@@ -16,10 +16,11 @@ import {
   getUser,
   getValueFromPath,
 } from "../utils/data/selectors";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { auth } from "../services/auth";
 import { Button } from "react-native-elements";
 import Icon from "react-native-vector-icons/Ionicons";
+import { colors, radius, spacing } from "../theme";
 
 export const Invite = ({ invite }) => {
   const [userName, setUserName] = useState("");
@@ -39,70 +40,88 @@ export const Invite = ({ invite }) => {
 
       setGroupMembers(await getGroupMembers(group));
     };
-
     fetchGroupData();
   }, [getValueFromPath(invite, INVITE_ID)]);
 
-  const toggleMembersView = () => setShowMembers(!showMembers);
   const isSelfInvite =
     getValueFromPath(invite, INVITE_SENT_BY) === auth.currentUserId();
-  return (
-    <View style={styles.container}>
-      <View style={styles.listItem}>
-        <Text style={styles.textBold}>{groupName || "Loading group..."}</Text>
-        <Text style={styles.text}>
-          Created by: {userName || "Loading user..."}
-        </Text>
 
-        {/* Toggle button to show/hide group members */}
-        <TouchableOpacity onPress={toggleMembersView}>
+  const confirmDelete = () =>
+    Alert.alert(
+      "Delete group?",
+      "This removes the group for everyone. This can't be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteGroup(groupId),
+        },
+      ]
+    );
+
+  const memberCount = groupMembers.length;
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.row}>
+        <View style={styles.info}>
+          <Text style={styles.name}>{groupName || "Loading group…"}</Text>
+          <Text style={styles.sub}>
+            Created by {userName || "…"}
+            {memberCount > 0 &&
+              ` · ${memberCount} member${memberCount > 1 ? "s" : ""}`}
+          </Text>
+        </View>
+        <Button
+          title="Join"
+          buttonStyle={styles.join}
+          titleStyle={styles.joinTitle}
+          onPress={() => joinGroup(groupId)}
+        />
+      </View>
+
+      <View style={styles.actions}>
+        <TouchableOpacity
+          style={styles.toggle}
+          onPress={() => setShowMembers((s) => !s)}
+        >
+          <Text style={styles.toggleText}>
+            {showMembers ? "Hide members" : "Show members"}
+          </Text>
           <Icon
             name={showMembers ? "chevron-up" : "chevron-down"}
-            size={24}
-            color="white"
+            size={18}
+            color={colors.textMuted}
           />
         </TouchableOpacity>
+
+        {isSelfInvite ? (
+          <TouchableOpacity onPress={confirmDelete}>
+            <Text style={styles.danger}>Delete</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={() => ignoreInvite(invite)}>
+            <Text style={styles.muted}>Ignore</Text>
+          </TouchableOpacity>
+        )}
       </View>
-      {/* Conditional rendering of group members */}
+
       {showMembers && (
-        <View style={styles.listItem}>
-          <Button
-            title="Join"
-            buttonStyle={styles.button}
-            onPress={() => joinGroup(groupId)}
-          />
-          {!isSelfInvite && (
-            <Button
-              title="Ignore"
-              type="outline"
-              buttonStyle={styles.button}
-              onPress={() => ignoreInvite(invite)}
-            />
+        <View style={styles.membersList}>
+          {memberCount > 0 ? (
+            groupMembers.map((member) => (
+              <Text
+                key={getValueFromPath(member, USER_ID)}
+                style={styles.memberText}
+              >
+                {getValueFromPath(member, USER_NAME)} ·{" "}
+                {getValueFromPath(member, USER_EMAIL)}
+              </Text>
+            ))
+          ) : (
+            <Text style={styles.memberText}>No members have joined yet.</Text>
           )}
-          {isSelfInvite && (
-            <Button
-              title="Delete"
-              type="outline"
-              buttonStyle={styles.button}
-              onPress={() => deleteGroup(groupId)}
-            />
-          )}
-          <View style={styles.membersList}>
-            {groupMembers.length > 0 ? (
-              groupMembers.map((member) => (
-                <Text
-                  key={getValueFromPath(member, USER_ID)}
-                  style={styles.memberText}
-                >
-                  {getValueFromPath(member, USER_NAME) +
-                    " - " +
-                    getValueFromPath(member, USER_EMAIL)}
-                </Text>
-              ))
-            ) : (
-              <Text style={styles.memberText}>No members found.</Text>
-            )}
-          </View>
         </View>
       )}
     </View>
@@ -110,47 +129,71 @@ export const Invite = ({ invite }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  info: {
     flex: 1,
-    alignItems: "stretch",
-    justifyContent: "flex-start",
-    borderBottomWidth: 1,
-    borderBottomColor: "lightgray",
+    paddingRight: spacing.md,
   },
-  textBold: {
-    fontWeight: "bold",
-    fontSize: 16,
-    color: "white",
-    paddingHorizontal: 10,
+  name: {
+    fontWeight: "700",
+    fontSize: 17,
+    color: colors.text,
   },
-  button: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginLeft: 10,
-    borderRadius: 5,
+  sub: {
+    color: colors.textMuted,
+    fontSize: 13,
+    marginTop: 2,
   },
-  text: { color: "white", paddingHorizontal: 10 },
-  memberText: {
-    color: "white",
-    fontSize: 14,
-    marginVertical: 2,
+  join: {
+    backgroundColor: colors.primary,
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
+  joinTitle: {
+    fontWeight: "700",
+  },
+  actions: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: spacing.md,
+  },
+  toggle: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   toggleText: {
-    color: "#007BFF",
-    marginTop: 10,
-    fontWeight: "bold",
-    textDecorationLine: "underline",
+    color: colors.textMuted,
+    marginRight: spacing.xs,
   },
-  listItem: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+  danger: {
+    color: colors.danger,
+    fontWeight: "600",
+  },
+  muted: {
+    color: colors.textMuted,
+    fontWeight: "600",
   },
   membersList: {
-    marginTop: 10,
-    paddingHorizontal: 8,
+    marginTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    paddingTop: spacing.sm,
+  },
+  memberText: {
+    color: colors.text,
+    fontSize: 14,
+    marginVertical: 2,
   },
 });

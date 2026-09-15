@@ -1,47 +1,74 @@
-import { FlatList, StyleSheet, View, Text } from "react-native";
+import { Alert, FlatList, StyleSheet, View, Text } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useInvites } from "../utils/hooks/useInvites";
 import { Background } from "../components/Background";
 import { Button } from "react-native-elements";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { Invite } from "../components/Invite";
 import { getValueFromPath } from "../utils/data/selectors";
 import { INVITE_ID } from "../utils/data/paths";
 import { CREATE_GROUP_SCREEN_NAME } from "./screenConstants";
 import { userSignOut } from "../utils/data/actions";
+import { colors, radius, spacing } from "../theme";
 
 export default function SignedInScreen({ navigation }) {
   const { receivedInvites } = useInvites();
-  // console.log("received invites");
-  // console.log(receivedInvites);
+  const insets = useSafeAreaInsets();
+
+  const confirmSignOut = () =>
+    Alert.alert("Sign out?", "You'll stop sharing your location.", [
+      { text: "Cancel", style: "cancel" },
+      { text: "Sign out", style: "destructive", onPress: userSignOut },
+    ]);
+
   return (
     <Background>
-      <View style={styles.container}>
-        <Text style={{ ...styles.text, fontSize: 18 }}>Invites received</Text>
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Groups</Text>
+          <Button
+            type="clear"
+            icon={<Icon name="logout" size={22} color={colors.textMuted} />}
+            onPress={confirmSignOut}
+          />
+        </View>
+
         <FlatList
-          flexGrow={1}
-          showsVerticalScrollIndicator={true}
-          showsHorizontalScrollIndicator={false}
+          style={styles.list}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
           keyExtractor={(invite) => getValueFromPath(invite, INVITE_ID)}
           data={receivedInvites}
           renderItem={({ item }) => <Invite invite={item} />}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>
-              No invites yet. Create a group to start tracking with friends.
-            </Text>
+            <View style={styles.empty}>
+              <Icon
+                name="map-marker-multiple-outline"
+                size={56}
+                color={colors.textMuted}
+              />
+              <Text style={styles.emptyTitle}>No groups yet</Text>
+              <Text style={styles.emptyText}>
+                Create a group and invite friends to start sharing locations.
+              </Text>
+            </View>
           }
-        ></FlatList>
-        <View style={styles.horizontalItems}>
-          <Button
-            title="Create Group"
-            buttonStyle={styles.button}
-            onPress={() => navigation.navigate(CREATE_GROUP_SCREEN_NAME)}
-          />
-          <Button
-            title="Sign Out"
-            type="outline"
-            buttonStyle={styles.button}
-            onPress={userSignOut}
-          />
-        </View>
+        />
+
+        <Button
+          title="Create group"
+          icon={
+            <Icon
+              name="plus"
+              size={20}
+              color={colors.text}
+              style={{ marginRight: spacing.sm }}
+            />
+          }
+          buttonStyle={styles.createButton}
+          titleStyle={styles.createTitle}
+          onPress={() => navigation.navigate(CREATE_GROUP_SCREEN_NAME)}
+        />
       </View>
     </Background>
   );
@@ -50,39 +77,49 @@ export default function SignedInScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  header: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginBottom: spacing.md,
   },
-  button: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginLeft: 10,
-    borderRadius: 5,
+  title: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: colors.text,
   },
-  text: {
-    color: "white",
+  list: {
+    flex: 1,
+  },
+  listContent: {
+    flexGrow: 1,
+    paddingBottom: spacing.md,
+  },
+  empty: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: spacing.lg,
+  },
+  emptyTitle: {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: "700",
+    marginTop: spacing.md,
   },
   emptyText: {
-    color: "white",
-    opacity: 0.8,
+    color: colors.textMuted,
     textAlign: "center",
-    marginTop: 24,
-    paddingHorizontal: 24,
+    marginTop: spacing.sm,
+    lineHeight: 20,
   },
-  listItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "lightgray",
+  createButton: {
+    backgroundColor: colors.primary,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
   },
-  horizontalItems: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+  createTitle: {
+    fontWeight: "700",
   },
 });

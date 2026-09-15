@@ -76,20 +76,16 @@ export async function updateUserLocation(latitude, longitude) {
 
 // Invite given emails to the given group
 export async function invite(emails, toGroupId) {
-  try {
-    const invites = await makeInvites(emails, toGroupId, auth.currentUserId());
-    for (const invite of invites) {
+  const invites = makeInvites(emails, toGroupId, auth.currentUserId());
+  await Promise.all(
+    invites.map((invite) => {
       const { key: inviteId } = database.push(INVITES);
-      database.set(INVITES + "/" + inviteId, {
+      return database.set(INVITES + "/" + inviteId, {
         ...invite,
         [INVITE_ID.substring(1)]: inviteId,
       });
-    }
-  } catch (error) {
-    //user with given email not found in users/
-    //If we don't catch, none of the users get invites due to error thrown
-    console.log(error.message);
-  }
+    })
+  );
 }
 
 export const ignoreInvite = async (invite) => {

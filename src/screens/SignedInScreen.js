@@ -23,6 +23,11 @@ export default function SignedInScreen({ navigation }) {
           keyExtractor={(invite) => getValueFromPath(invite, INVITE_ID)}
           data={receivedInvites}
           renderItem={({ item }) => <Invite invite={item} />}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>
+              No invites yet. Create a group to start tracking with friends.
+            </Text>
+          }
         ></FlatList>
         <View style={styles.horizontalItems}>
           <Button
@@ -56,6 +61,13 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "white",
+  },
+  emptyText: {
+    color: "white",
+    opacity: 0.8,
+    textAlign: "center",
+    marginTop: 24,
+    paddingHorizontal: 24,
   },
   listItem: {
     flexDirection: "row",

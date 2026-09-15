@@ -1,16 +1,19 @@
 import { useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, View } from "react-native";
 import { Button, Input } from "react-native-elements";
 import { Background } from "../components/Background";
 import { auth } from "../services/auth";
 import { createGroup } from "../utils/data/actions";
 import { SIGNED_IN_SCREEN_NAME } from "./screenConstants";
-import { getUserFromEmail } from "../utils/data/selectors";
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const CreateGroupScreen = function ({ navigation }) {
   const [list, setList] = useState([auth.currentUserEmail()]); //list of emails state
   const [entry, setEntry] = useState(""); //input box state
+  const [entryError, setEntryError] = useState("");
   const [groupName, setGroupName] = useState("");
+  const [creating, setCreating] = useState(false);
   const keyExtractor = (item, index) => index.toString();
   const InviteListItem = (email) => (
     <View style={styles.listItem}>
@@ -43,24 +46,36 @@ const CreateGroupScreen = function ({ navigation }) {
         <Input
           placeholder="Email of participant"
           value={entry}
-          onChangeText={setEntry}
+          onChangeText={(text) => {
+            setEntry(text);
+            if (entryError) setEntryError("");
+          }}
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType="email-address"
+          errorMessage={entryError}
           style={styles.text}
         ></Input>
         <Button
           title="Add"
           buttonStyle={styles.button}
-          onPress={async () => {
-            // Only if entry is non empty, not duplicate and a user with given email is found
-            // TODO: throw relevant errors here to notify user
-            const normalizedEntry = entry?.toLowerCase();
-            if (
-              normalizedEntry &&
-              !list.includes(normalizedEntry) &&
-              (await getUserFromEmail(normalizedEntry))
-            ) {
-              setList([...list, normalizedEntry]);
-              setEntry("");
+          onPress={() => {
+            const normalizedEntry = entry.trim().toLowerCase();
+            if (!normalizedEntry) {
+              setEntryError("Enter an email address");
+              return;
             }
+            if (!EMAIL_REGEX.test(normalizedEntry)) {
+              setEntryError("Enter a valid email address");
+              return;
+            }
+            if (list.includes(normalizedEntry)) {
+              setEntryError("This email is already added");
+              return;
+            }
+            setList([...list, normalizedEntry]);
+            setEntry("");
+            setEntryError("");
           }}
         ></Button>
         <FlatList
@@ -68,13 +83,29 @@ const CreateGroupScreen = function ({ navigation }) {
           data={list}
           renderItem={({ item }) => InviteListItem(item)}
         ></FlatList>
+        <Text style={styles.hint}>
+          People not yet on the app will see the invite when they sign up with
+          the invited email.
+        </Text>
         <Button
           title="Done"
           buttonStyle={styles.button}
-          onPress={() => {
-            if (groupName) {
-              createGroup(list, groupName);
+          disabled={creating}
+          icon={
+            creating ? <ActivityIndicator color="white" size="small" /> : undefined
+          }
+          onPress={async () => {
+            if (!groupName.trim()) {
+              return;
+            }
+            setCreating(true);
+            try {
+              await createGroup(list, groupName.trim());
               navigation.navigate(SIGNED_IN_SCREEN_NAME);
+            } catch (error) {
+              Alert.alert("Couldn't create group", error.message);
+            } finally {
+              setCreating(false);
             }
           }}
         ></Button>
@@ -96,6 +127,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   text: { color: "white" },
+  hint: {
+    color: "white",
+    opacity: 0.8,
+    fontSize: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    fontStyle: "italic",
+  },
   listItem: {
     flexDirection: "row",
     justifyContent: "space-between",

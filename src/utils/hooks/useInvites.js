@@ -43,7 +43,7 @@ function useReceivedInvites(setErrorMsg) {
   useEffect(() => {
     const unsubscribeAdd = database.onChildAdded(
       INVITES,
-      [INVITE_SENT_TO.substring(1), "equals", auth.currentUserId()],
+      [INVITE_SENT_TO.substring(1), "equals", auth.currentUserEmail().toLowerCase()],
       ({ key, val }) => {
         setInvites((invites) => [...invites, val]);
       },
@@ -51,7 +51,7 @@ function useReceivedInvites(setErrorMsg) {
     );
     const unsubscribeRemove = database.onChildRemoved(
       INVITES,
-      [INVITE_SENT_TO.substring(1), "equals", auth.currentUserId()],
+      [INVITE_SENT_TO.substring(1), "equals", auth.currentUserEmail().toLowerCase()],
       ({ key, val }) => {
         setInvites((invites) =>
           invites.filter((elem) => getValueFromPath(elem, INVITE_ID) != key)

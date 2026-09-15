@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { Icon } from "react-native-elements";
 import { useUsers } from "../utils/hooks/useUsers";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import { exitGroup } from "../utils/data/actions";
 import { getValueFromPath } from "../utils/data/selectors";
-import { USER_ID } from "../utils/data/paths";
+import { USER_ID, USER_LATITUDE, USER_LONGITUDE } from "../utils/data/paths";
 import { useLocationEffect } from "../utils/hooks/useLocationEffect";
 import { CustomMarker } from "../components/MapCustomMarker";
 import {
@@ -29,22 +29,54 @@ export default function MapScreen({
   const [autofocus, setAutoFocus] = useState(true);
   const mapviewRef = useRef(null);
   const [] = useLocationEffect(setErrorMsg);
-  useEffect(() => {
-    if (autofocus)
-      mapviewRef.current?.fitToSuppliedMarkers(Object.keys(allUsers), {
-        animated: false,
+  // only users with a real location fix belong on the map; a missing fix or a
+  // (0,0) default would otherwise drop a phantom marker in the ocean
+  const locatedUsers = Object.values(allUsers).filter((user) => {
+    const latitude = getValueFromPath(user, USER_LATITUDE);
+    const longitude = getValueFromPath(user, USER_LONGITUDE);
+    return (
+      typeof latitude === "number" &&
+      typeof longitude === "number" &&
+      !(latitude === 0 && longitude === 0)
+    );
+  });
+  const regionRef = useRef(null);
+  const fitToUsers = () => {
+    if (locatedUsers.length === 0) return;
+    mapviewRef.current?.fitToSuppliedMarkers(
+      locatedUsers.map((user) => getValueFromPath(user, USER_ID)),
+      {
+        animated: true,
         edgePadding: {
           top: V_PADDING,
           left: H_PADDING,
           bottom: V_PADDING,
           right: H_PADDING,
         },
-      });
-  }, [allUsers]);
-  const onRegionChange = useCallback((inRegion, { isGesture }) => {
-    // console.log(`region: ${JSON.stringify(inRegion)}`);
+      }
+    );
+  };
+  // Re-fit the camera only when a tracked user has moved outside the current
+  // viewport (or on first fix / membership change). Fitting on every location
+  // update fought the marker's own coordinate animation and made markers jitter.
+  useEffect(() => {
+    if (!autofocus) return;
+    const region = regionRef.current;
+    const anyOutside = locatedUsers.some((user) => {
+      if (!region) return true;
+      const latitude = getValueFromPath(user, USER_LATITUDE);
+      const longitude = getValueFromPath(user, USER_LONGITUDE);
+      return (
+        Math.abs(latitude - region.latitude) > region.latitudeDelta / 2 ||
+        Math.abs(longitude - region.longitude) > region.longitudeDelta / 2
+      );
+    });
+    if (anyOutside) fitToUsers();
+  }, [allUsers, autofocus]);
+  const onRegionChangeComplete = useCallback((region, { isGesture }) => {
+    regionRef.current = region;
     if (isGesture) setAutoFocus(false);
-  });
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -62,13 +94,19 @@ export default function MapScreen({
             }}
             provider={PROVIDER_GOOGLE}
             style={styles.map}
-            onRegionChange={onRegionChange}
+            onRegionChangeComplete={onRegionChangeComplete}
           >
-            {Object.values(allUsers).map((user) => (
+            {locatedUsers.map((user) => (
               <CustomMarker data={user} key={getValueFromPath(user, USER_ID)} />
             ))}
           </MapView>
-          <Text style={styles.counter}>{Object.keys(allUsers).length}</Text>
+          {locatedUsers.length === 0 && (
+            <View style={styles.waiting} pointerEvents="none">
+              <ActivityIndicator size="large" />
+              <Text style={styles.waitingText}>Waiting for locations…</Text>
+            </View>
+          )}
+          <Text style={styles.counter}>{locatedUsers.length}</Text>
           <Icon
             name="close"
             type="material"
@@ -81,7 +119,10 @@ export default function MapScreen({
             type="material-community"
             size={20}
             containerStyle={styles.focusButton}
-            onPress={() => setAutoFocus(true)}
+            onPress={() => {
+              setAutoFocus(true);
+              fitToUsers();
+            }}
           />
         </View>
       )}
@@ -101,6 +142,16 @@ const styles = StyleSheet.create({
     top: "1%",
     left: "1%",
     backgroundColor: "yellow",
+  },
+  waiting: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  waitingText: {
+    marginTop: 8,
+    fontSize: 16,
+    color: "#333",
   },
   closeButton: {
     position: "absolute",

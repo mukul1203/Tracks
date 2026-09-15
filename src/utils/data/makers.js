@@ -21,11 +21,13 @@ export const makeObjFromlist = (list) => {
   }, {});
 };
 
-export const makeInvites = async (emails, toGroupId, from) => {
-  return (await getUserIds(emails)).map((userId) => {
+export const makeInvites = (emails, toGroupId, from) => {
+  return emails.map((email) => {
     return {
       [INVITE_SENT_BY.substring(1)]: from,
-      [INVITE_SENT_TO.substring(1)]: userId,
+      // store the raw email so people who don't have an account yet can still
+      // be invited; they resolve to a real invite once they sign up with it
+      [INVITE_SENT_TO.substring(1)]: email.trim().toLowerCase(),
       [INVITE_GROUP.substring(1)]: toGroupId,
     };
   });
